@@ -6,3 +6,5 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect, render_to_respo
 
 
 ## view for display home page
+def homePage(request):
+	return render_to_response('homepage.html')
