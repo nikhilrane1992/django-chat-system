@@ -42,25 +42,26 @@ function sync_messages() {
  */
 function layout_and_bind(html_el_id) {
 		// layout stuff
-		var html = '<div id="chat-messages-container">'+
-		'<div id="chat-messages"> </div>'+
-		'<div id="chat-last"> </div>'+
-		'</div>'+
-		'<form id="chat-form">'+
-		'<input name="message" type="text" class="message" />'+
-		'<input type="submit" value="Say"/>'+
-		'</form>';
+		// var html = '<div id="chat-messages-container">'+
+		// '<div id="chat-messages"> </div>'+
+		// '<div id="chat-last"> </div>'+
+		// '</div>'+
+		// '<form id="chat-form">'+
+		// '<input name="message" type="text" class="message" />'+
+		// '<input type="submit" value="Say"/>'+
+		// '</form>';
 
-		$("#"+html_el_id).append(html);
+		// $("#"+html_el_id).append(html);
 
 		// event stuff
-    	$("#chat-form").submit( function () {
+    	$("#btn-chat").click( function () {
             var $inputs = $(this).children('input');
             var values = {};
 
-            $inputs.each(function(i,el) {
-            	values[el.name] = $(el).val();
-            });
+            // $inputs.each(function(i,el) {
+            // 	values[el.name] = $(el).val();
+            // });
+    		values['message'] = $('.message').val();
 			values['chat_room_id'] = window.chat_room_id;
 
         	$.ajax({
@@ -69,7 +70,7 @@ function layout_and_bind(html_el_id) {
                 type: 'post',
                 url: '/chat/send/'
             });
-            $('#chat-form .message').val('');
+            $('#btn-chat .message').val('');
             return false;
 	});
 };
@@ -94,9 +95,10 @@ function get_messages() {
 			// add messages
 			$.each(json, function(i,m){
 				if (m.type == 's')
-					$('#chat-messages').append('<div class="system">' + replace_emoticons(m.message) + '</div>');
+					$('.msg_container_base').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(m.message) +'</p><time datetime="2009-11-13T20:00">Timothy • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
 				else if (m.type == 'm')
-					$('#chat-messages').append('<div class="message"><div class="author">'+m.author+'</div>'+replace_emoticons(m.message) + '</div>');
+					// $('.msg_container').append('<div class="message"><div class="author">'+m.author+'</div>'+replace_emoticons(m.message) + '</div>');
+					$('.msg_container_base').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(m.message) +'</p><time datetime="2009-11-13T20:00">'+m.author+' • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
 				else if (m.type == 'j')
 					$('#chat-messages').append('<div class="join">'+m.author+' has joined</div>');
 				else if (m.type == 'l')
