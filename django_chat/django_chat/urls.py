@@ -5,5 +5,8 @@ from django.conf.urls.static import static
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^dchat/' , include('dchat.urls')),
+    # url(r'^request/$', 'forum.views.forum'),
+
+    url(r'^$', 'django_chat.views.test'),
+    url(r'^chat/', include('dchat.urls')),
 )+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
