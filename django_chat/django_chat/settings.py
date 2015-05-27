@@ -26,6 +26,9 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+TEMPLATE_DIRS =(
+os.path.join(BASE_DIR,"html_templates"),
+)
 
 # Application definition
 
