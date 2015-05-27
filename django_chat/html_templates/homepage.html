@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" >
-<body>
+<html lang="en" ng-app="ChatApp">
+<head>
+    <title>Simple Chat App</title>
+</head>
+
+<body ng-controller="ChatCtrl">
 {% load static %}
 <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
-
+   {% verbatim %}
+    <center>  <h1>{{msg}}</h1> </center>
+   {% endverbatim %}
 <div class="container">
     <div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_1" style="margin-left:10px;">
         <div class="col-xs-12 col-md-12">
@@ -94,16 +100,17 @@
                 </div>
                 <div class="panel-footer">
                     <div class="input-group">
-                        <input id="btn-input" type="text" class="form-control input-sm chat_input" placeholder="Write your message here..." />
+                        <input id="btn-input" type="text" class="form-control input-sm chat_input" ng-model="messageToSend"
+                        placeholder="Write your message here..." />
                         <span class="input-group-btn">
-                        <button class="btn btn-primary btn-sm" id="btn-chat">Send</button>
+                        <button class="btn btn-primary btn-sm" id="btn-chat" ng-click="sendMessage(messageToSend)">Send</button>
                         </span>
                     </div>
                 </div>
     		</div>
         </div>
     </div>
-    
+
     <div class="btn-group dropup">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
             <span class="glyphicon glyphicon-cog"></span>
@@ -118,8 +125,17 @@
         </ul>
     </div>
 </div>
-</body>
+
 <script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'angular/js/angular.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+<script src="{% static 'angular/js/angular-sanitize.js' %}"></script>
+<script src="{% static 'angular/js/ui-bootstrap-tpls-0.12.0.min.js' %}"></script>
+
+
 <script src="{% static 'js/homepage.js' %}"></script>
+<script src="{% static 'angular/chatApp.js' %}"></script>
+
+</body>
 </html>
