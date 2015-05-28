@@ -36,10 +36,10 @@ def sync(request):
     #     raise Http404
     dataDictionary = json.loads(request.body)
 
-    if not dataDictionary.get('id'):
+    if not dataDictionary['id']:
         raise Http404
 
-    roomObj = Room.objects.get(id=post['id'])
+    roomObj = Room.objects.get(id=dataDictionary['id'])
 
     lastMsgId = roomObj.last_message_id()    
 
