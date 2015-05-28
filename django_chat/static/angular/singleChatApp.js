@@ -3,11 +3,12 @@
 	chatApp.controller('singleChatCtrl', ['$scope', '$log', '$http', '$timeout', function($scope, $log, $http, $timeout){
 
 		$scope.messageToSend = "";
-		$scope.chat_room_id = "";
+		$scope.chat_room_id = 1;
 		$scope.last_received = "";
 		$scope.init = function () {
 			$log.debug("Hello guest");
 			// getChatIdFromServer();
+			sync_messages();
 		};
 		$timeout($scope.init);
 
