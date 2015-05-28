@@ -43,7 +43,7 @@
 			$scope.chat_room_id = parseInt($scope.chat_room_id);
 			$http.post('/chat/sync/',{id:$scope.chat_room_id}).then(function (response) {
 				$log.debug(response.data);
-				// $scope.last_received =
+				$scope.last_received = response.data.last_message_id;
 			});
 
 			$timeout(function(){$scope.get_messages();}, 5000);
