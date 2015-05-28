@@ -3,7 +3,7 @@
 	chatApp.controller('singleChatCtrl', ['$scope', '$log', '$http', '$timeout', function($scope, $log, $http, $timeout){
 
 		$scope.messageToSend = "";
-		$scope.chat_room_id = 1;
+		$scope.chat_room_id = "";
 		$scope.last_received = "";
 		$scope.init = function () {
 			$log.debug("Hello guest");
@@ -13,8 +13,9 @@
 		$timeout($scope.init);
 
 		var getChatIdFromServer = function() {
-			$http.get('/dont know yet/',{message:sendMessage}).then(function (response) {
+			$http.get('/chat/room/id/').then(function (response) {
 				$log.debug(response.data);
+				$scope.chat_room_id = response.data.chat_id;
 			});
 		};
 
@@ -42,7 +43,7 @@
 			$scope.chat_room_id = parseInt($scope.chat_room_id);
 			$http.post('/chat/sync/',{id:$scope.chat_room_id}).then(function (response) {
 				$log.debug(response.data);
-				// $scope.last_received =
+				$scope.last_received = response.data.last_message_id;
 			});
 
 			$timeout(function(){$scope.get_messages();}, 5000);
