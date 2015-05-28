@@ -20,9 +20,9 @@ def send(request):
     chat_room_id
     message
     '''
-    p = request.POST
-    r = Room.objects.get(id=int(p['chat_room_id']))
-    r.say(request.user, p['message'])
+	dataDictionary = json.loads(request.body)
+    roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
+    roomObj.say(request.user, dataDictionary['message'])
     return HttpResponse('')
 
 @login_required
@@ -34,9 +34,9 @@ def sync(request):
     '''
     # if request.method != 'POST':
     #     raise Http404
-    post = request.POST
+    dataDictionary = json.loads(request.body)
 
-    if not post.get('id'):
+    if not dataDictionary.get('id'):
         raise Http404
 
     r = Room.objects.get(id=post['id'])
