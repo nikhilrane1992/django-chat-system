@@ -23,15 +23,15 @@ function init_chat(chat_id, html_el_id) {
  * @return
  */
 function sync_messages() {
-    $.ajax({
-        type: 'POST',
-        data: {id:window.chat_room_id},
-        url:'/chat/sync/',
+	$.ajax({
+		type: 'POST',
+		data: {id:window.chat_room_id},
+		url:'/chat/sync/',
 		dataType: 'json',
 		success: function (json) {
-        	last_received = json.last_message_id;
+			last_received = json.last_message_id;
 		}
-    });
+	});
 
 	setTimeout("get_messages()", 2000);
 }
@@ -54,24 +54,24 @@ function layout_and_bind(html_el_id) {
 		// $("#"+html_el_id).append(html);
 
 		// event stuff
-    	$("#btn-chat").click( function () {
-            var $inputs = $(this).children('input');
-            var values = {};
+		$("#btn-chat").click( function () {
+			var $inputs = $(this).children('input');
+			var values = {};
 
-            // $inputs.each(function(i,el) {
-            // 	values[el.name] = $(el).val();
-            // });
-    		values['message'] = $('.message').val();
+			// $inputs.each(function(i,el) {
+			// 	values[el.name] = $(el).val();
+			// });
+			values['message'] = $('.message').val();
 			values['chat_room_id'] = window.chat_room_id;
 
-        	$.ajax({
-                data: values,
-                dataType: 'json',
-                type: 'post',
-                url: '/chat/send/'
-            });
-            $('#btn-chat .message').val('');
-            return false;
+			$.ajax({
+				data: values,
+				dataType: 'json',
+				type: 'post',
+				url: '/chat/send/'
+			});
+			$('#btn-chat .message').val('');
+			return false;
 	});
 };
 
@@ -79,10 +79,10 @@ function layout_and_bind(html_el_id) {
  * Gets the list of messages from the server and appends the messages to the chatbox
  */
 function get_messages() {
-    $.ajax({
-        type: 'POST',
-        data: {id:window.chat_room_id, offset: window.last_received},
-        url:'/chat/receive/',
+	$.ajax({
+		type: 'POST',
+		data: {id:window.chat_room_id, offset: window.last_received},
+		url:'/chat/receive/',
 		dataType: 'json',
 		success: function (json) {
 			var scroll = false;
@@ -111,10 +111,10 @@ function get_messages() {
 			if (scroll)
 				$("#chat-messages-container").animate({ scrollTop: $("#chat-messages-container").attr("scrollHeight") }, 500);
 		}
-    });
+	});
 
-    // wait for next
-    setTimeout("get_messages()", 2000);
+	// wait for next
+	setTimeout("get_messages()", 2000);
 }
 
 /**
@@ -123,10 +123,10 @@ function get_messages() {
 function chat_join() {
 	$.ajax({
 		async: false,
-        type: 'POST',
-        data: {chat_room_id:window.chat_room_id},
-        url:'/chat/join/',
-    });
+		type: 'POST',
+		data: {chat_room_id:window.chat_room_id},
+		url:'/chat/join/',
+	});
 }
 
 /**
@@ -135,10 +135,10 @@ function chat_join() {
 function chat_leave() {
 	$.ajax({
 		async: false,
-        type: 'POST',
-        data: {chat_room_id:window.chat_room_id},
-        url:'/chat/leave/',
-    });
+		type: 'POST',
+		data: {chat_room_id:window.chat_room_id},
+		url:'/chat/leave/',
+	});
 }
 
 // attach join and leave events
