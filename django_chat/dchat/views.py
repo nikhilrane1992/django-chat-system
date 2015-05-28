@@ -39,11 +39,11 @@ def sync(request):
     if not dataDictionary.get('id'):
         raise Http404
 
-    r = Room.objects.get(id=post['id'])
+    roomObj = Room.objects.get(id=post['id'])
 
-    lmid = r.last_message_id()    
+    lastMsgId = roomObj.last_message_id()    
 
-    return HttpResponse(jsonify({'last_message_id':lmid}))
+    return HttpResponse(jsonify({'last_message_id':lastMsgId}))
 
 @login_required
 def receive(request):
@@ -57,39 +57,39 @@ def receive(request):
     This could be useful:
     @see: http://www.djangosnippets.org/snippets/622/
     '''
-    if request.method != 'POST':
+    if not request.body:
         raise Http404
-    post = request.POST
+    dataDictionary = json.loads(request.body)
 
-    if not post.get('id') or not post.get('offset'):
+    if not dataDictionary['id'] or not dataDictionary['offset']:
         raise Http404
 
     try:
-        room_id = int(post['id'])
+        room_id = int(dataDictionary['id'])
     except:
         raise Http404
 
     try:
-        offset = int(post['offset'])
+        offset = int(dataDictionary['offset'])
     except:
         offset = 0
 
-    r = Room.objects.get(id=room_id)
+    roomObj = Room.objects.get(id=room_id)
 
-    m = r.messages(offset)
+    msg = roomObj.messages(offset)
 
-    return HttpResponse(jsonify(m, ['id','author','message','type']))
+    return HttpResponse(jsonify(msg, ['id','author','message','type']))
 
 @login_required
 def join(request):
     '''
-    Expects the following POST parameters:
+    Expects the following body parameters:
     chat_room_id
     message
     '''
-    p = request.POST
-    r = Room.objects.get(id=int(p['chat_room_id']))
-    r.join(request.user)
+    dataDictionary = json.loads(request.body)
+    roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
+    roomObj.join(request.user)
     return HttpResponse('')
 
 @login_required
@@ -99,9 +99,9 @@ def leave(request):
     chat_room_id
     message
     '''
-    p = request.POST
-    r = Room.objects.get(id=int(p['chat_room_id']))
-    r.leave(request.user)
+    dataDictionary = json.loads(request.body)
+    roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
+    roomObj.leave(request.user)
     return HttpResponse('')
 
 def jsonify(object, fields=None, to_dict=False):
