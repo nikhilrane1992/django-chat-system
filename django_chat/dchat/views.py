@@ -16,7 +16,7 @@ from models import Room, Message
 @login_required
 def send(request):
     '''
-    Expects the following POST parameters:
+    Expects the following body parameters:
     chat_room_id
     message
     '''
@@ -142,7 +142,8 @@ def usergroup_index(request, group_id):
 def send_chat_id(request):
     userObj = User.objects.get(id=request.user.id)
     roomObj = Room.objects.get_or_create(userObj)
-    return HttpResponse(json.dumps({"chat_id": roomObj.id, "status":True}), content_type = "application/json")
+    user_name = request.user.username.strip()
+    return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):
