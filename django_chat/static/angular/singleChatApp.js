@@ -7,7 +7,7 @@
 		$scope.last_received = "";
 		$scope.init = function () {
 			$log.debug("Hello guest");
-			// getChatIdFromServer();
+			getChatIdFromServer();
 			sync_messages();
 		};
 		$timeout($scope.init);
