@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse, HttpResponseRedirect, render_to_response
 from django.template import RequestContext
 from django.contrib.auth.models import User 
-
+import json
 from models import Room, Message
 # from models import UserGroup
 
@@ -20,7 +20,7 @@ def send(request):
     chat_room_id
     message
     '''
-	dataDictionary = json.loads(request.body)
+    dataDictionary = json.loads(request.body)
     roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
     roomObj.say(request.user, dataDictionary['message'])
     return HttpResponse('')
@@ -47,6 +47,7 @@ def sync(request):
 
 @login_required
 def receive(request):
+    print request.body
     '''
     Returned serialized data
 
@@ -137,6 +138,11 @@ def usergroup_index(request, group_id):
     group = UserGroup.models.get(id=group_id)
     room = Room.objects.get_or_create(group)
     return render_to_response("homepage.html", {'group':group, 'chat_id':room.id})
+
+def send_chat_id(request):
+    group = UserGroup.models.get(id=group_id)
+    room = Room.objects.get_or_create(group)
+    return HttpResponse(json.dumps({"chat_id": room.id, "status":False}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):
