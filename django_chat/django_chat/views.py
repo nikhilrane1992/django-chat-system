@@ -12,3 +12,8 @@ def test(request):
     r = Room.objects.get_or_create(u)
 
     return render_to_response('homepage.html', {'js': ['/static/js/chat.js'], 'chat_id':r.pk}, context_instance=RequestContext(request))
+
+@login_required
+def chatWithUs(request):
+    return render_to_response('singleChatIndex.html')
+

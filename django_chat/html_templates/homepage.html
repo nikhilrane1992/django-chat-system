@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="ChatApp">
+<html lang="en">
 <head>
     <title>Simple Chat App</title>
 </head>
 
-<body ng-controller="ChatCtrl">
+<body>
 {% load static %}
 <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
 <link href="{% static 'css/chat.css' %}" rel="stylesheet">
-<div class="container">
+
+<button class="btn btn-default" onclick="window.open('/chat_with_us/','','width=450, height=400');">Chat With Us</button>
+
+
+
+
+<!-- <div class="container">
     <div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_1" style="margin-left:10px;">
         <div class="col-xs-12 col-md-12">
         	<div class="panel panel-default">
@@ -122,7 +128,7 @@
             <li><a href="#"><span class="glyphicon glyphicon-eye-close"></span> Invisivel</a></li>
         </ul>
     </div>
-</div>
+</div> -->
 </body>
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'angular/js/angular.min.js' %}"></script>
@@ -136,8 +142,8 @@ $(window).ready(function(){
 <script src="{% static 'angular/js/ui-bootstrap-tpls-0.12.0.min.js' %}"></script>
 
 <!-- <script src="{% static 'js/chat.js' %}"></script> -->
-<script src="{% static 'js/homepage.js' %}"></script>
-<script src="{% static 'angular/chatApp.js' %}"></script>
+<!-- <script src="{% static 'js/homepage.js' %}"></script> -->
+<!-- <script src="{% static 'angular/chatApp.js' %}"></script> -->
 
 </body>
 </html>

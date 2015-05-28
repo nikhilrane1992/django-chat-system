@@ -8,5 +8,6 @@ urlpatterns = patterns('',
     # url(r'^request/$', 'forum.views.forum'),
 
     url(r'^$', 'django_chat.views.test'),
+    url(r'^chat_with_us/', 'django_chat.views.chatWithUs'),
     url(r'^chat/', include('dchat.urls')),
 )+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
