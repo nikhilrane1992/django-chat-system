@@ -140,9 +140,9 @@ def usergroup_index(request, group_id):
     return render_to_response("homepage.html", {'group':group, 'chat_id':room.id})
 
 def send_chat_id(request):
-    group = UserGroup.models.get(id=group_id)
-    room = Room.objects.get_or_create(group)
-    return HttpResponse(json.dumps({"chat_id": room.id, "status":False}), content_type = "application/json")
+    userObj = User.objects.get(id=request.user.id)
+    roomObj = Room.objects.get_or_create(userObj)
+    return HttpResponse(json.dumps({"chat_id": roomObj.id, "status":True}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):
