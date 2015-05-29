@@ -17,3 +17,10 @@ def test(request):
 def chatWithUs(request):
     return render_to_response('singleChatIndex.html')
 
+
+@login_required
+def expertChat(request):
+    return render_to_response('expertView/expertIndex.html')
+
+
+
