@@ -79,7 +79,7 @@ def receive(request):
 
     msg = roomObj.messages(offset)
 
-    return HttpResponse(jsonify(msg, ['id','author','message','type']))
+    return HttpResponse(jsonify(msg, ['id','author','message','type', 'room.id']))
 
 @login_required
 def join(request):
@@ -222,7 +222,7 @@ def send_expert_chat_id(request):
     expertObj = User.objects.get(id=request.user.id)
     print '--------->', expertObj
     cidobjList = One_to_one_chat.objects.filter(expert=expertObj)
-    print '--------->', cid
+    print '--------->', cidobjList
     user_name = request.user.username.strip()
     if len(cidobjList) == 0:
         return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
