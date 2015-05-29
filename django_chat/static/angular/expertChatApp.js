@@ -5,8 +5,8 @@
 		$(window).unload(function(){chat_leave()});
 
 		$scope.messageToSend = "";
-		$scope.chat_room_id = "";
-		$scope.last_received = "";
+		$scope.chat_room_id = [];
+		$scope.last_received = [];
 		$scope.loginUser = "";
 		$scope.init = function () {
 			$log.debug("Hello guest");
@@ -17,7 +17,7 @@
 		var getChatIdFromServer = function() {
 			$http.get('/chat/room/id/expert/').then(function (response) {
 				$log.debug(response.data);
-				$scope.chat_room_id = response.data.chatIdList[0];
+				$scope.chat_room_id = response.data.chatIdList;
 				$scope.loginUser = response.data.user_name;
 
 				angular.forEach(response.data.chatIdList,function(id){
@@ -130,13 +130,13 @@
 		}
 
 		function chat_join(idList) {
-			$http.post('/chat/join/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
+			$http.post('/chat/join/',{chatIdList:$scope.chat_room_id}).then(function (response) {
 				sync_messages(idList);
 			});
 		}
 
 		function chat_leave() {
-			$http.post('/chat/leave/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
+			$http.post('/chat/leave/',{chatIdList:$scope.chat_room_id}).then(function (response) {
 
 			});
 		}
@@ -170,8 +170,15 @@
 		};
 
 		$(document).on('click', '.icon_close', function (e) {
-			$(this).parent().parent().parent().parent().remove();
+			var id = $(this).attr('value');
+			id = parseInt(id);
+
+			$http.post('/chat/room/close/',{chatRoomId:id}).then(function (response) {
+				$(this).parent().parent().parent().parent().remove();
+			});
+
 		});
+
 
 		$(document).on('click', '.btn_chat', function (e) {
 
