@@ -40,8 +40,8 @@
 		};
 
 		$scope.get_messages = function() {
-			$scope.last_received = parseInt($scope.last_received);
-			$http.post('/chat/receive/',{id:$scope.chat_room_id, offset: $scope.last_received}).then(function (response) {
+			// $scope.last_received = parseInt($scope.last_received);
+			$http.post('/chat/receive/',{idOffsetList:$scope.last_received}).then(function (response) {
 				$log.debug(response.data);
 
 				angular.forEach(response.data.msgList, function(obj) {
@@ -75,7 +75,7 @@
 
 			$http.post('/chat/sync/',{idList:idList}).then(function (response) {
 				$log.debug(response.data);
-				$scope.last_received = response.data.last_message_idList;
+				$scope.last_received = response.data.lastMessageIdList;
 
 			});
 
