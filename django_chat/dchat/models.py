@@ -28,6 +28,13 @@ class RoomManager(models.Manager):
         except Room.DoesNotExist:
             return self.create(object)
 
+    def create_(self, object):
+        return self.create(object)
+
+
+    def get_(self, object):
+        return self.get_for_object(object)
+
 class Room(models.Model):
     '''Representation of a generic chat room'''
     content_type = models.ForeignKey(ContentType) # to what kind of object is this related
@@ -107,3 +114,10 @@ class Message(models.Model):
             return 'ACTION: %s > %s' % (self.author, self.message)
         return self.message
 
+
+
+class One_to_one_chat(models.Model):
+    expert = models.ForeignKey(User, related_name='expert', blank=True, null=True)
+    author = models.ForeignKey(User, related_name='user', blank=True, null=True)
+
+        

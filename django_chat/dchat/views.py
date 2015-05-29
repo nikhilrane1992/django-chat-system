@@ -8,9 +8,9 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse, HttpResponseRedirect, render_to_response
 from django.template import RequestContext
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import User, Group
 import json
-from models import Room, Message
+from models import Room, Message, One_to_one_chat
 # from models import UserGroup
 
 @login_required
@@ -139,11 +139,102 @@ def usergroup_index(request, group_id):
     room = Room.objects.get_or_create(group)
     return render_to_response("homepage.html", {'group':group, 'chat_id':room.id})
 
-def send_chat_id(request):
+def get_create_chat_room_id(expert, author):
+    try:
+        cid = One_to_one_chat.objects.filter(author=author)
+        cid = cid[len(cid)-1]
+        return cid
+    except Exception, e:
+        print e
+        cid = One_to_one_chat.objects.filter(author=None)
+        if len(cid) == 0:
+            return None
+        else:
+            cid = cid[len(cid)-1]
+            cid.author = author
+            cid.save()
+            return cid
+def available_expert(expert, author): 
+    try:
+        cid = One_to_one_chat.objects.filter(expert=expert)
+        cid = cid[len(cid)-1]
+    except Exception, e:
+        print e
+        cid = One_to_one_chat(expert=expert)
+        cid.save()
+    return cid
+
+# def send_expert_chat_id(request):
+#     # print request
+#     group = Group.objects.get(name="EXPERT")
+#     print '---------->', group
+#     expertList = group.user_set.all()
+#     print '----------------',expertList
+#     loggedInExpertsList = []
+#     for expert in expertList:
+#         if expert.is_authenticated():
+#             loggedInExpertsList.append(expert)
+#     userObj = User.objects.get(id=request.user.id)
+#     if userObj in expertList:
+#         print 'Expert found'
+#         author=None
+#         cid = available_expert(userObj, author)
+#     else:
+#         print 'User found'
+#         expert = None
+#         cid = get_create_chat_room_id(expert, userObj)
+#         if cid == None:
+#             print 'No Expert available'
+#         roomObj = Room.objects.create_(cid)
+#         user_name = request.user.username.strip()
+#     if not cid.author:
+#         return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
+#     else:
+#         return HttpResponse(json.dumps({"chat_id": '', "user_name": '',  "status":True}), content_type = "application/json")
+
+
+def send_applicant_chat_id(request):
+    # print request
+    group = Group.objects.get(name="EXPERT")
+    print '---------->', group
+    expertList = group.user_set.all()
+    print '----------------',expertList
+    loggedInExpertsList = []
+    for expert in expertList:
+        if expert.is_authenticated():
+            loggedInExpertsList.append(expert)
     userObj = User.objects.get(id=request.user.id)
-    roomObj = Room.objects.get_or_create(userObj)
+    if len(loggedInExpertsList) == 0:
+        return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
+    else:
+        try:
+            cid = One_to_one_chat.objects.get(expert=loggedInExpertsList[0], author=userObj)
+        except Exception, e:
+            print e
+            cid = One_to_one_chat(expert=loggedInExpertsList[0], author=userObj)
+            cid.save()
+        roomObj = Room.objects.get_or_create(cid)
+        user_name = request.user.username.strip()
+        return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
+
+
+def send_expert_chat_id(request):
+    expertObj = User.objects.get(id=request.user.id)
+    print '--------->', expertObj
+    cidobjList = One_to_one_chat.objects.filter(expert=expertObj)
+    print '--------->', cid
     user_name = request.user.username.strip()
-    return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
+    if len(cidobjList) == 0:
+        return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
+    else:
+        # cid = cid[len(cid)-1]
+        chatIdList = []
+        for obj in cidobjList:
+            roomObj = Room.objects.get_(obj)
+            chatIdList.append(roomObj.id)
+        return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name,  "status":True}), content_type = "application/json")
+   
+
 
 ## view for display home page
 def homePage(request):

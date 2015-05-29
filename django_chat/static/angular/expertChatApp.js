@@ -15,16 +15,16 @@
 		$timeout($scope.init);
 
 		var getChatIdFromServer = function() {
-			$http.get('/chat/room/id/').then(function (response) {
-				$log.debug(response.data);
-				$scope.chat_room_id = response.data.chat_id;
-				$scope.loginUser = response.data.user_name;
-				$log.debug($scope.chat_room_id);
-				$log.debug(parseInt($scope.chat_room_id));
-				chat_join();
+            $http.get('/chat/room/id/expert/').then(function (response) {
+                $log.debug(response.data);
+                $scope.chat_room_id = response.data.chat_id;
+                $scope.loginUser = response.data.user_name;
+                $log.debug($scope.chat_room_id);
+                $log.debug(parseInt($scope.chat_room_id));
+                chat_join();
 
-			});
-		};
+            });
+        };
 
 		$scope.sendMessage = function(messageToSend) {
 			// $log.debug(messageToSend);
