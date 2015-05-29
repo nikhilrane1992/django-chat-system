@@ -115,9 +115,13 @@ class Message(models.Model):
         return self.message
 
 
-
+CHAT_ROOM_STATUS = (
+    ('o','online'),
+    ('f','offline'),
+)
 class One_to_one_chat(models.Model):
     expert = models.ForeignKey(User, related_name='expert', blank=True, null=True)
     author = models.ForeignKey(User, related_name='user', blank=True, null=True)
+    status = models.CharField(max_length=1, choices=CHAT_ROOM_STATUS)
 
         

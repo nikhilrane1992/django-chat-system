@@ -1,7 +1,4 @@
 # -*- encoding: UTF-8 -*-
-'''
-Chat application views, some are tests... some are not
-'''
 from datetime import datetime
 
 from django.http import HttpResponse, Http404
@@ -11,15 +8,9 @@ from django.template import RequestContext
 from django.contrib.auth.models import User, Group
 import json
 from models import Room, Message, One_to_one_chat
-# from models import UserGroup
 
 @login_required
 def send(request):
-    '''
-    Expects the following body parameters:
-    chat_room_id
-    message
-    '''
     dataDictionary = json.loads(request.body)
     roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
     roomObj.say(request.user, dataDictionary['message'])
@@ -27,13 +18,6 @@ def send(request):
 
 @login_required
 def sync(request):
-    '''Return last message id
-
-    EXPECTS the following POST parameters:
-    id
-    '''
-    # if request.method != 'POST':
-    #     raise Http404
     dataDictionary = json.loads(request.body)
 
     if not dataDictionary['idList']:
@@ -47,17 +31,6 @@ def sync(request):
 
 @login_required
 def receive(request):
-    print request.body
-    '''
-    Returned serialized data
-
-    EXPECTS the following POST parameters:
-    id
-    offset
-
-    This could be useful:
-    @see: http://www.djangosnippets.org/snippets/622/
-    '''
     if not request.body:
         raise Http404
     dataDictionary = json.loads(request.body)
@@ -86,30 +59,23 @@ def receive(request):
 
 @login_required
 def join(request):
-    '''
-    Expects the following body parameters:
-    chat_room_id
-    message
-    '''
     dataDictionary = json.loads(request.body)
-    roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
-    roomObj.join(request.user)
+    chatIdList = dataDictionary['chatIdList']
+    for i in chatIdList:
+        roomObj = Room.objects.get(id=int(i))
+        roomObj.join(request.user)
     return HttpResponse('')
 
 @login_required 
 def leave(request):
-    '''
-    Expects the following POST parameters:
-    chat_room_id
-    message
-    '''
     dataDictionary = json.loads(request.body)
-    roomObj = Room.objects.get(id=int(dataDictionary['chat_room_id']))
-    roomObj.leave(request.user)
+    chatIdList = dataDictionary['chatIdList']
+    for i in chatIdList:
+        roomObj = Room.objects.get(id=int(i))
+        roomObj.leave(request.user)
     return HttpResponse('')
 
 def jsonify(object, fields=None, to_dict=False):
-    '''Funcion utilitaria para convertir un query set a formato JSON'''
     try:
         import json
     except ImportError:
@@ -167,41 +133,9 @@ def available_expert(expert, author):
         cid.save()
     return cid
 
-# def send_expert_chat_id(request):
-#     # print request
-#     group = Group.objects.get(name="EXPERT")
-#     print '---------->', group
-#     expertList = group.user_set.all()
-#     print '----------------',expertList
-#     loggedInExpertsList = []
-#     for expert in expertList:
-#         if expert.is_authenticated():
-#             loggedInExpertsList.append(expert)
-#     userObj = User.objects.get(id=request.user.id)
-#     if userObj in expertList:
-#         print 'Expert found'
-#         author=None
-#         cid = available_expert(userObj, author)
-#     else:
-#         print 'User found'
-#         expert = None
-#         cid = get_create_chat_room_id(expert, userObj)
-#         if cid == None:
-#             print 'No Expert available'
-#         roomObj = Room.objects.create_(cid)
-#         user_name = request.user.username.strip()
-#     if not cid.author:
-#         return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
-#     else:
-#         return HttpResponse(json.dumps({"chat_id": '', "user_name": '',  "status":True}), content_type = "application/json")
-
-
 def send_applicant_chat_id(request):
-    # print request
     group = Group.objects.get(name="EXPERT")
-    print '---------->', group
     expertList = group.user_set.all()
-    print '----------------',expertList
     loggedInExpertsList = []
     for expert in expertList:
         if expert.is_authenticated():
@@ -211,11 +145,14 @@ def send_applicant_chat_id(request):
         return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
     else:
         try:
-            cid = One_to_one_chat.objects.get(expert=loggedInExpertsList[0], author=userObj)
+            cid = One_to_one_chat.objects.get(author=userObj, status='o')
         except Exception, e:
             print e
-            cid = One_to_one_chat(expert=loggedInExpertsList[0], author=userObj)
-            cid.save()
+            for expert in loggedInExpertsList:
+                count = One_to_one_chat.objects.filter(expert=expert, status='o').count()
+                if count < 4:
+                    cid = One_to_one_chat(expert=loggedInExpertsList[0], author=userObj, status='o')
+                    cid.save()
         roomObj = Room.objects.get_or_create(cid)
         user_name = request.user.username.strip()
         return HttpResponse(json.dumps({"chatIdList": [roomObj.id], "user_name": user_name,  "status":True}), content_type = "application/json")
@@ -223,20 +160,29 @@ def send_applicant_chat_id(request):
 
 def send_expert_chat_id(request):
     expertObj = User.objects.get(id=request.user.id)
-    print '--------->', expertObj
     cidobjList = One_to_one_chat.objects.filter(expert=expertObj)
-    print '--------->', cidobjList
     user_name = request.user.username.strip()
     if len(cidobjList) == 0:
         return HttpResponse(json.dumps({"chatIdList": '', "user_name": user_name,  "status":True}), content_type = "application/json")
     else:
-        # cid = cid[len(cid)-1]
         chatIdList = []
         for obj in cidobjList:
             roomObj = Room.objects.get_(obj)
             chatIdList.append(roomObj.id)
         return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name,  "status":True}), content_type = "application/json")
    
+
+## Close chat room
+def closeChatRoom(request):
+    dataDictionary = json.loads(request.body)
+    chatRoomId = dataDictionary['chatRoomId']
+    roomObj = Room.objects.get(id=chatRoomId)
+    oneToOneChatId = roomObj.object_id
+    oneToOneChatObj = One_to_one_chat.objects.get(id=oneToOneChatId)
+    oneToOneChatObj.status = 'f'
+    oneToOneChatObj.save()
+    return HttpResponse('')
+
 
 
 ## view for display home page
