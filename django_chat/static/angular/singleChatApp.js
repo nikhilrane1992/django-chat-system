@@ -19,7 +19,7 @@
 				$scope.loginUser = response.data.user_name;
 				$log.debug($scope.chat_room_id);
 				$log.debug(parseInt($scope.chat_room_id));
-				sync_messages();
+				chat_join();
 			});
 		};
 
@@ -99,6 +99,21 @@
 			});
 			return text;
 		}
+
+		function chat_join() {
+			$http.post('/chat/join/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
+				sync_messages();
+			});
+		}
+
+		function chat_leave() {
+			$http.post('/chat/leave/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
+
+			});
+		}
+
+		$(window).unload(function(){chat_leave()});
+
 
 	}]); //controller ends
 
