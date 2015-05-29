@@ -218,7 +218,7 @@ def send_applicant_chat_id(request):
             cid.save()
         roomObj = Room.objects.get_or_create(cid)
         user_name = request.user.username.strip()
-        return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
+        return HttpResponse(json.dumps({"chatIdList": [roomObj.id], "user_name": user_name,  "status":True}), content_type = "application/json")
 
 
 def send_expert_chat_id(request):
