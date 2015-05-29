@@ -35,16 +35,25 @@
 			if(messageToSend.length != 0){
 				$http.post('/chat/send/',{message:messageToSend,chat_room_id:id}).then(function (response) {
 					$log.debug(response.data);
+					$('input.message').val("");
 				});
 			}
 		};
 
 		$scope.get_messages = function() {
-			// $scope.last_received = parseInt($scope.last_received);
+			$log.debug("before sent: ");
+			$log.debug($scope.last_received);
 			$http.post('/chat/receive/',{idOffsetList:$scope.last_received}).then(function (response) {
 				$log.debug(response.data);
 
+
+				// first check if we are at the bottom of the div, if we are, we shall scroll once the content is added
+
+
 				angular.forEach(response.data.msgList, function(obj) {
+
+
+					$('.msg_container_base_'+obj.chat_id).css("overflo")
 					if (obj.type == 's')
 						$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">Timothy • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
 					else if (obj.type == 'm'){
@@ -59,12 +68,22 @@
 					else if (obj.type == 'l')
 						$('.msg_container_base_'+obj.chat_id).append('<div class="leave">'+obj.author+' has left</div>');
 
-					$scope.last_received = obj.id;
-					$log.debug("Last received: " + $scope.last_received);
+
+					for(var i = 0; i < $scope.last_received.length; i++){
+						if($scope.last_received[i].chat_id == obj.chat_id){
+							$scope.last_received[i].last_message_id = obj.id;
+						}
+					}
+
+
+					$('.msg_container_base_'+obj.chat_id).animate({ scrollTop: $('.msg_container_base_'+obj.chat_id).height() }, "slow");
+					return false;
+
+					// $scope.last_received.push(lastReceivedObject);
+					// $log.debug($scope.last_received);
 				});
 			});
 
-			$('input.message').val("");
 
 			$timeout(function(){$scope.get_messages();}, 5000);
 		}
