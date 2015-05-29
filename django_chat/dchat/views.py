@@ -78,8 +78,11 @@ def receive(request):
     roomObj = Room.objects.get(id=room_id)
 
     msg = roomObj.messages(offset)
-
-    return HttpResponse(jsonify(msg, ['id','author','message','type', 'room.id']))
+    msgList = []
+    for i in msg:
+        obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
+        msgList.append(obj)
+    return HttpResponse(json.dumps({'msgList': msgList, 'status':True}), content_type = "application/json")
 
 @login_required
 def join(request):
@@ -93,7 +96,7 @@ def join(request):
     roomObj.join(request.user)
     return HttpResponse('')
 
-@login_required
+@login_required 
 def leave(request):
     '''
     Expects the following POST parameters:
@@ -225,7 +228,7 @@ def send_expert_chat_id(request):
     print '--------->', cidobjList
     user_name = request.user.username.strip()
     if len(cidobjList) == 0:
-        return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
+        return HttpResponse(json.dumps({"chatIdList": '', "user_name": user_name,  "status":True}), content_type = "application/json")
     else:
         # cid = cid[len(cid)-1]
         chatIdList = []
