@@ -1,6 +1,6 @@
 (function(){
 	var chatApp = angular.module('expertChatApp',[]);
-	chatApp.controller('expertChatCtrl', ['$scope', '$log', '$http', '$timeout', function($scope, $log, $http, $timeout){
+	chatApp.controller('expertChatCtrl', ['$scope', '$log', '$http', '$timeout', '$compile', function($scope, $log, $http, $timeout, $compile){
 
 		$(window).unload(function(){chat_leave()});
 
@@ -15,22 +15,25 @@
 		$timeout($scope.init);
 
 		var getChatIdFromServer = function() {
-            $http.get('/chat/room/id/expert/').then(function (response) {
-                $log.debug(response.data);
-                $scope.chat_room_id = response.data.chatIdList[0];
-                $scope.loginUser = response.data.user_name;
-                $log.debug($scope.chat_room_id);
-                $log.debug(parseInt($scope.chat_room_id));
-                chat_join();
+			$http.get('/chat/room/id/expert/').then(function (response) {
+				$log.debug(response.data);
+				$scope.chat_room_id = response.data.chatIdList[0];
+				$scope.loginUser = response.data.user_name;
 
-            });
-        };
+				angular.forEach(response.data.chatIdList,function(id){
+					createChatBox(id);
+				});
 
-		$scope.sendMessage = function(messageToSend) {
+				chat_join();
+
+			});
+		};
+
+		var sendMessage = function(messageToSend,id) {
 			// $log.debug(messageToSend);
-			$scope.chat_room_id = parseInt($scope.chat_room_id);
+			id = parseInt(id);
 			if(messageToSend.length != 0){
-				$http.post('/chat/send/',{message:messageToSend,chat_room_id:$scope.chat_room_id}).then(function (response) {
+				$http.post('/chat/send/',{message:messageToSend,chat_room_id:id}).then(function (response) {
 					$log.debug(response.data);
 				});
 			}
@@ -115,16 +118,46 @@
 			});
 		}
 
-		for(var i = 0; i < 2; i++ ){
-			var size = $( ".chat-window:last-child" ).css("margin-left");
-			size_total = parseInt(size) + 400;
-			// alert(size_total);
-			var clone = $( ".chat-window" ).clone().appendTo( ".container" );
-			clone.css("margin-left", size_total);
-			clone.addClass("new_"+i);
-			clone.removeAttr('id');
-		}
+		// for(var i = 0; i < 2; i++ ){
+		// 	var size = $( ".chat-window:last-child" ).css("margin-left");
+		// 	size_total = parseInt(size) + 400;
+		// 	// alert(size_total);
+		// 	var clone = $( ".chat-window" ).clone().appendTo( ".container" );
+		// 	clone.css("margin-left", size_total);
+		// 	clone.addClass("new_"+i);
+		// 	clone.removeAttr('id');
+		// }
 
+		var createChatBox = function(id) {
+			$log.debug("box id: " + id);
+			var size = $(".chat-window:last-child" ).css("margin-left");
+			$log.debug("size: "+ size);
+
+			if(angular.isUndefined(size)){
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				$compile(chatBox)($scope);
+			}else{
+				var size_total = parseInt(size) + 400;
+				$log.debug("Margin Size : " + size_total);
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				$compile(chatBox)($scope);
+			}
+			$(".container").append(chatBox);
+
+		};
+
+		$(document).on('click', '.icon_close', function (e) {
+			$(this).parent().parent().parent().parent().remove();
+		});
+
+		$(document).on('click', '.btn_chat', function (e) {
+
+			var id = $(this).val();
+			var msg = $(this).parent().prev('input.message').val();
+
+			sendMessage(msg,id);
+
+		});
 
 	}]); //controller ends
 
