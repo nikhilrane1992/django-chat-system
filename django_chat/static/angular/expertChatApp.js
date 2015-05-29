@@ -24,7 +24,7 @@
 					createChatBox(id);
 				});
 
-				chat_join();
+				chat_join(response.data.chatIdList);
 
 			});
 		};
@@ -44,34 +44,38 @@
 			$http.post('/chat/receive/',{id:$scope.chat_room_id, offset: $scope.last_received}).then(function (response) {
 				$log.debug(response.data);
 
-				angular.forEach(response.data, function(obj) {
+				angular.forEach(response.data.msgList, function(obj) {
 					if (obj.type == 's')
-						$('.msg_container_base').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">Timothy • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
+						$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">Timothy • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
 					else if (obj.type == 'm'){
 						if(obj.author == $scope.loginUser){
-							$('.msg_container_base').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
+							$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
 						}else{
-							$('.msg_container_base').append('<div class="row msg_container base_receive"><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_receive"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div></div>');
+							$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_receive"><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_receive"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div></div>');
 						}
 					}
 					else if (obj.type == 'j')
-						$('.msg_container_base').append('<div class="join">'+obj.author+' has joined</div>');
+						$('.msg_container_base_'+obj.chat_id).append('<div class="join">'+obj.author+' has joined</div>');
 					else if (obj.type == 'l')
-						$('.msg_container_base').append('<div class="leave">'+obj.author+' has left</div>');
+						$('.msg_container_base_'+obj.chat_id).append('<div class="leave">'+obj.author+' has left</div>');
 
 					$scope.last_received = obj.id;
 					$log.debug("Last received: " + $scope.last_received);
 				});
 			});
+
+			$('input.message').val("");
+
 			$timeout(function(){$scope.get_messages();}, 5000);
 		}
 
-		var sync_messages = function() {
+		var sync_messages = function(idList) {
 
-			$scope.chat_room_id = parseInt($scope.chat_room_id);
-			$http.post('/chat/sync/',{id:$scope.chat_room_id}).then(function (response) {
+			// $scope.chat_room_id = parseInt($scope.chat_room_id);
+
+			$http.post('/chat/sync/',{idList:idList}).then(function (response) {
 				$log.debug(response.data);
-				$scope.last_received = response.data.last_message_id;
+				$scope.last_received = response.data.last_message_idList;
 
 			});
 
@@ -106,9 +110,9 @@
 			return text;
 		}
 
-		function chat_join() {
+		function chat_join(idList) {
 			$http.post('/chat/join/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
-				sync_messages();
+				sync_messages(idList);
 			});
 		}
 
@@ -134,12 +138,12 @@
 			$log.debug("size: "+ size);
 
 			if(angular.isUndefined(size)){
-				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 				$compile(chatBox)($scope);
 			}else{
 				var size_total = parseInt(size) + 400;
 				$log.debug("Margin Size : " + size_total);
-				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 				$compile(chatBox)($scope);
 			}
 			$(".container").append(chatBox);
@@ -153,7 +157,7 @@
 		$(document).on('click', '.btn_chat', function (e) {
 
 			var id = $(this).val();
-			var msg = $(this).parent().prev('input.message').val();
+			var msg = $(this).closest('span').prev('input.message').val();
 
 			sendMessage(msg,id);
 
