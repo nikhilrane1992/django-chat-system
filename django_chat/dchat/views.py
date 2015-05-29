@@ -62,27 +62,29 @@ def receive(request):
         raise Http404
     dataDictionary = json.loads(request.body)
 
-    if not dataDictionary['id'] or not dataDictionary['offset']:
+    if not dataDictionary['idOffsetList']:
         raise Http404
+    idOffsetMsgList = []
+    for obj in dataDictionary['idOffsetList']:
+        try:
+            room_id = int(obj['chat_id'])
+        except:
+            raise Http404
 
-    try:
-        room_id = int(dataDictionary['id'])
-    except:
-        raise Http404
+        try:
+            offset = int(obj['last_message_id'])
+        except:
+            offset = 0
 
-    try:
-        offset = int(dataDictionary['offset'])
-    except:
-        offset = 0
+        roomObj = Room.objects.get(id=room_id)
 
-    roomObj = Room.objects.get(id=room_id)
-
-    msg = roomObj.messages(offset)
-    msgList = []
-    for i in msg:
-        obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
-        msgList.append(obj)
-    return HttpResponse(json.dumps({'msgList': msgList, 'status':True}), content_type = "application/json")
+        msg = roomObj.messages(offset)
+        msgList = []
+        for i in msg:
+            obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
+            msgList.append(obj)
+        idOffsetMsgList.append({'msgList': msgList})
+    return HttpResponse(json.dumps('idOffsetMsgList': idOffsetMsgList), content_type = "application/json")
 
 @login_required
 def join(request):
