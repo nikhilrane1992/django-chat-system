@@ -10,5 +10,5 @@ urlpatterns = patterns('',
     url(r'^sync/$', 'dchat.views.sync'),
     url(r'^join/$', 'dchat.views.join'),
     url(r'^leave/$', 'dchat.views.leave'),
-    url(r'^room/id/$', 'dchat.views.send_chat_id'),
+    url(r'^room/id/$', 'dchat.views.send_expert_chat_id'),
 )
