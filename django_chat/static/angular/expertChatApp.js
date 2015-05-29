@@ -13,7 +13,7 @@
         $timeout($scope.init);
 
         var getChatIdFromServer = function() {
-            $http.get('/chat/room/id/').then(function (response) {
+            $http.get('/chat/room/id/expert/').then(function (response) {
                 $log.debug(response.data);
                 $scope.chat_room_id = response.data.chat_id;
                 $scope.loginUser = response.data.user_name;

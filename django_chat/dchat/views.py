@@ -193,7 +193,7 @@ def available_expert(expert, author):
 #         return HttpResponse(json.dumps({"chat_id": '', "user_name": '',  "status":True}), content_type = "application/json")
 
 
-def send_expert_chat_id(request):
+def send_applicant_chat_id(request):
     # print request
     group = Group.objects.get(name="EXPERT")
     print '---------->', group
@@ -204,23 +204,36 @@ def send_expert_chat_id(request):
         if expert.is_authenticated():
             loggedInExpertsList.append(expert)
     userObj = User.objects.get(id=request.user.id)
-    if userObj in expertList:
-        print 'Expert found'
-        author=None
-        cid = available_expert(userObj, author)
+    if len(loggedInExpertsList) == 0:
+        return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
     else:
-        print 'User found'
-        expert = None
-        cid = get_create_chat_room_id(expert, userObj)
-        if cid == None:
-            print 'No Expert available'
-        roomObj = Room.objects.create_(cid)
+        try:
+            cid = One_to_one_chat.objects.get(expert=loggedInExpertsList[0], author=userObj)
+        except Exception, e:
+            print e
+            cid = One_to_one_chat(expert=loggedInExpertsList[0], author=userObj)
+            cid.save()
+        roomObj = Room.objects.get_or_create(cid)
         user_name = request.user.username.strip()
-    if not cid.author:
         return HttpResponse(json.dumps({"chat_id": roomObj.id, "user_name": user_name,  "status":True}), content_type = "application/json")
-    else:
-        return HttpResponse(json.dumps({"chat_id": '', "user_name": '',  "status":True}), content_type = "application/json")
 
+
+def send_expert_chat_id(request):
+    expertObj = User.objects.get(id=request.user.id)
+    print '--------->', expertObj
+    cidobjList = One_to_one_chat.objects.filter(expert=expertObj)
+    print '--------->', cid
+    user_name = request.user.username.strip()
+    if len(cidobjList) == 0:
+        return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
+    else:
+        # cid = cid[len(cid)-1]
+        chatIdList = []
+        for obj in cidobjList:
+            roomObj = Room.objects.get_(obj)
+            chatIdList.append(roomObj.id)
+        return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name,  "status":True}), content_type = "application/json")
+   
 
 
 ## view for display home page
