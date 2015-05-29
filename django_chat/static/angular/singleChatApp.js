@@ -5,8 +5,8 @@
 		$(window).unload(function(){chat_leave()});
 
 		$scope.messageToSend = "";
-		$scope.chat_room_id = "";
-		$scope.last_received = "";
+		$scope.chat_room_id = [];
+		$scope.last_received = [];
 		$scope.loginUser = "";
 		$scope.init = function () {
 			$log.debug("Hello guest");
@@ -17,7 +17,7 @@
 		var getChatIdFromServer = function() {
 			$http.get('/chat/room/id/applicant/').then(function (response) {
 				$log.debug(response.data);
-				$scope.chat_room_id = response.data.chatIdList[0];
+				$scope.chat_room_id = response.data.chatIdList;
 				$scope.loginUser = response.data.user_name;
 
 				angular.forEach(response.data.chatIdList,function(id){
@@ -130,13 +130,13 @@ var sync_messages = function(idList) {
 		 }
 
 		 function chat_join(idList) {
-		 	$http.post('/chat/join/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
+		 	$http.post('/chat/join/',{chatIdList:$scope.chat_room_id}).then(function (response) {
 		 		sync_messages(idList);
 		 	});
 		 }
 
 		 function chat_leave() {
-		 	$http.post('/chat/leave/',{chat_room_id:$scope.chat_room_id}).then(function (response) {
+		 	$http.post('/chat/leave/',{chatIdList:$scope.chat_room_id}).then(function (response) {
 
 		 	});
 		 }
@@ -157,12 +157,12 @@ var sync_messages = function(idList) {
 			$log.debug("size: "+ size);
 
 			if(angular.isUndefined(size)){
-				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" value="'+id +'"data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 				$compile(chatBox)($scope);
 			}else{
 				var size_total = parseInt(size) + 400;
 				$log.debug("Margin Size : " + size_total);
-				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" value="'+id +'" data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 				$compile(chatBox)($scope);
 			}
 			$(".container").append(chatBox);
@@ -170,7 +170,13 @@ var sync_messages = function(idList) {
 		};
 
 		$(document).on('click', '.icon_close', function (e) {
-			$(this).parent().parent().parent().parent().remove();
+			var id = $(this).attr('value');
+			id = parseInt(id);
+
+		 	$http.post('/chat/room/close/',{chatRoomId:id}).then(function (response) {
+				$(this).parent().parent().parent().parent().remove();
+		 	});
+
 		});
 
 		$(document).on('click', '.btn_chat', function (e) {
@@ -179,8 +185,9 @@ var sync_messages = function(idList) {
 			var msg = $(this).closest('span').prev('input.message').val();
 
 			sendMessage(msg,id);
-
 		});
+
+
 
 	}]); //controller ends
 
