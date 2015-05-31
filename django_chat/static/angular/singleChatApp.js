@@ -82,13 +82,13 @@
 					// $scope.last_received.push(lastReceivedObject);
 					// $log.debug($scope.last_received);
 				});
-});
+		});
 
 
-$timeout(function(){$scope.get_messages();}, 5000);
-}
+		$timeout(function(){$scope.get_messages();}, 5000);
+		}
 
-var sync_messages = function(idList) {
+		var sync_messages = function(idList) {
 
 			// $scope.chat_room_id = parseInt($scope.chat_room_id);
 
@@ -108,13 +108,13 @@ var sync_messages = function(idList) {
 			':D' : 'emoticon_grin.png',
 			'=D' : 'emoticon_happy.png',
 			':\\)' : 'emoticon_smile.png',
-':O' : 'emoticon_surprised.png',
-':P' : 'emoticon_tongue.png',
-':\\(' : 'emoticon_unhappy.png',
-	':3' : 'emoticon_waii.png',
-	';\\)' : 'emoticon_wink.png',
-'\\(ball\\)' : 'sport_soccer.png'
-}
+			':O' : 'emoticon_surprised.png',
+			':P' : 'emoticon_tongue.png',
+			':\\(' : 'emoticon_unhappy.png',
+			':3' : 'emoticon_waii.png',
+			';\\)' : 'emoticon_wink.png',
+			'\\(ball\\)' : 'sport_soccer.png'
+		};
 
 		/**
 		 * Regular expression maddness!!!
