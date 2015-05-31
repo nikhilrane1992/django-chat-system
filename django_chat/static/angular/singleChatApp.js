@@ -2,7 +2,10 @@
 	var chatApp = angular.module('singleChatApp',[]);
 	chatApp.controller('singleChatCtrl', ['$scope', '$log', '$http', '$timeout', '$compile', function($scope, $log, $http, $timeout, $compile){
 
-		$(window).unload(function(){chat_leave()});
+		// $(window).unload(function(){chat_leave()});
+		window.onbeforeunload = function() {
+			    chat_leave();
+			}
 
 		$scope.messageToSend = "";
 		$scope.chat_room_id = [];
@@ -174,8 +177,8 @@ var sync_messages = function(idList) {
 			id = parseInt(id);
 
 		 	$http.post('/chat/room/close/',{chatRoomId:id}).then(function (response) {
-				$(this).parent().parent().parent().parent().remove();
 		 	});
+			$(this).parent().parent().parent().parent().remove();
 
 		});
 
