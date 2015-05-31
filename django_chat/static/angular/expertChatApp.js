@@ -174,8 +174,8 @@
 			id = parseInt(id);
 
 			$http.post('/chat/room/close/',{chatRoomId:id}).then(function (response) {
-				$(this).parent().parent().parent().parent().remove();
-			});
+            });
+			$(this).parent().parent().parent().parent().remove();
 
 		});
 

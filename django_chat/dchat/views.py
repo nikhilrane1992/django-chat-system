@@ -73,6 +73,11 @@ def leave(request):
     for i in chatIdList:
         roomObj = Room.objects.get(id=int(i))
         roomObj.leave(request.user)
+        roomObj = Room.objects.get(id=i)
+        oneToOneChatId = roomObj.object_id
+        oneToOneChatObj = One_to_one_chat.objects.get(id=oneToOneChatId)
+        oneToOneChatObj.status = 'f'
+        oneToOneChatObj.save()
     return HttpResponse('')
 
 def jsonify(object, fields=None, to_dict=False):
