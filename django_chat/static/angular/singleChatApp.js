@@ -109,6 +109,7 @@
 			$http.post('/chat/sync/',{idList:idList}).then(function (response) {
 				$log.debug(response.data);
 				$scope.last_received = response.data.lastMessageIdList;
+				$('.load_earlier_message').val($scope.last_received[0].last_message_id);
 			});
 
 			$timeout(function(){$scope.get_messages();}, 5000);
@@ -210,9 +211,10 @@
 		$(document).on('click', '.load_earlier_message', function (e) {
 
 			var id = $(this).val();
+			alert(id);
 			var msg = $(this).closest('span').prev('input.message').val();
 
-			sendMessage(msg,id);
+			$scope.get_messages();
 		});
 
 
