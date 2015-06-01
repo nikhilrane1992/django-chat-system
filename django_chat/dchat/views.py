@@ -7,7 +7,7 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect, render_to_respo
 from django.template import RequestContext
 from django.contrib.auth.models import User, Group
 import json
-from models import Room, Message, One_to_one_chat
+from models import Room, Message, One_to_one_chat, Applicant
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 
@@ -54,7 +54,14 @@ def receive(request):
         roomObj = Room.objects.get(id=room_id)
         msg = roomObj.messages(offset)
         for i in msg:
-            obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
+            try:
+                applicant = Applicant.objects.get(applicant=i.author)
+                profile_pic = '/Media/'+ str(applicant.thumbnail)
+                print 'profile_pic', profile_pic
+            except Exception, e:
+                print e
+                profile_pic = '/Media/appliant_profile_photo/default.jpg'
+            obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id, 'profile_pic': profile_pic}
             msgList.append(obj)
     return HttpResponse(json.dumps({'msgList': msgList}), content_type = "application/json")
 
@@ -147,7 +154,15 @@ def send_applicant_chat_id(request):
             cid.save()
         roomObj = Room.objects.get_or_create(cid)
         user_name = request.user.username.strip()
-        return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name}], "user_name": user_name,  "status":True}), content_type = "application/json")
+        try:
+            applicant = Applicant.objects.get(applicant=request.user)
+            profile_pic = '/Media/'+ str(applicant.thumbnail)
+            print 'profile_pic', profile_pic
+        except Exception, e:
+            print e
+            profile_pic = '/Media/appliant_profile_photo/default.jpg'
+        return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name, 'profile_pic': profile_pic}], 
+            "user_name": user_name, "status":True}), content_type = "application/json")
 
 
 def send_expert_chat_id(request):
@@ -159,9 +174,15 @@ def send_expert_chat_id(request):
     else:
         chatIdList = []
         for obj in cidobjList:
+            try:
+                applicant = Applicant.objects.get(applicant=obj.auther)
+                profile_pic = '/Media/'+ str(applicant.thumbnail)
+            except Exception, e:
+                print e
+                profile_pic = '/Media/appliant_profile_photo/default.jpg'
             roomObj = Room.objects.get_(obj)
-            chatIdList.append({'chat_id': roomObj.id, 'username': obj.author.username})
-        return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name,  "status":True}), content_type = "application/json")
+            chatIdList.append({'chat_id': roomObj.id, 'username': obj.author.username, 'profile_pic': profile_pic})
+        return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name, 'profile_pic': profile_pic, "status":True}), content_type = "application/json")
 
 
 ## Close chat room
@@ -180,16 +201,24 @@ def loadEarlierMessages(request):
     chatRoomId = dataDictionary['chatRoomId']
     roomObj = Room.objects.get(id=chatRoomId)
     try:
-        offset = obj['last_message_id']
-    except:
+        offset = int(dataDictionary['last_message_id']) 
+    except Exception, e:
+        print e
         offset = 0
 
     msg, last_message_id = roomObj.load_earlier_messages(offset)
     msgList = []
     for i in msg:
-        obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
+        try:
+            applicant = Applicant.objects.get(applicant=i.author)
+            profile_pic = '/Media/'+ str(applicant.thumbnail)
+        except Exception, e:
+            print e
+            profile_pic = '/Media/appliant_profile_photo/default.jpg'
+
+        obj = {'id': i.id, 'author': i.author.username, 'profile_pic': profile_pic, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
         msgList.append(obj)
-    return HttpResponse(json.dumps({'msgList': msgList, 'last_message_id': last_message_id}), content_type = "application/json")
+    return HttpResponse(json.dumps({'msgList': msgList, 'last_message_id': last_message_id, 'chatRoomId': roomObj.id}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):
