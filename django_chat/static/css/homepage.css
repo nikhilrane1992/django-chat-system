@@ -132,3 +132,16 @@ img {
     left:0px;
     bottom:0;
 }
+
+/*++++++++++++++++++++++++++*/
+.chat_list
+{
+    background-color: #F5F5F5;
+}
+.chat_list_top_bar {
+  background: #666;
+  padding-left: 20px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}

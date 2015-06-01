@@ -21,7 +21,7 @@
 				$scope.loginUser = response.data.user_name;
 
 				angular.forEach(response.data.chatIdList,function(id){
-					createChatBox(id);
+					// createChatBox(id);
 				});
 
 				chat_join(response.data.chatIdList);
