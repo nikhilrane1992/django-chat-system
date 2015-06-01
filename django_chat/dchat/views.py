@@ -175,7 +175,20 @@ def closeChatRoom(request):
     oneToOneChatObj.save()
     return HttpResponse('')
 
+def loadEarlierMessages(request):
+    dataDictionary = json.loads(request.body)
+    chatRoomId = dataDictionary['chatRoomId']
+    roomObj = Room.objects.get(id=chatRoomId)
+    try:
+        offset = obj['last_message_id']
+    except:
+        offset = 0
 
+    msg = roomObj.messages(offset)
+    for i in msg:
+        obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
+        msgList.append(obj)
+    return HttpResponse(json.dumps({'msgList': msgList}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):

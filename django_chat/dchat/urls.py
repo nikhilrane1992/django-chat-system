@@ -13,4 +13,5 @@ urlpatterns = patterns('',
     url(r'^room/id/expert/$', 'dchat.views.send_expert_chat_id'),
     url(r'^room/id/applicant/$', 'dchat.views.send_applicant_chat_id'),
     url(r'^room/close/$', 'dchat.views.closeChatRoom'),
+    url(r'^load/earlier/message/$', 'dchat.views.loadEarlierMessages'),
 )

@@ -70,6 +70,16 @@ class Room(models.Model):
             m = m.filter(timestamp__gte=after_date)
         return m.order_by('pk')
 
+    def load_earlier_messages(self, after_pk=None, after_date=None):
+        m = Message.objects.filter(room=self)
+        if after_pk:
+            before_pk = after_pk - 10
+            m = m.filter(pk__gt=before_pk)[:10]
+        if after_date:
+            m = m.filter(timestamp__gte=after_date)
+        return m.order_by('-pk')
+
+
     def last_message_id_list(self):
         '''Return last message sent to room'''
         m = Message.objects.filter(room=self).order_by('-pk')
