@@ -184,11 +184,11 @@ def loadEarlierMessages(request):
     except:
         offset = 0
 
-    msg = roomObj.messages(offset)
+    msg, last_message_id = roomObj.load_earlier_messages(offset)
     for i in msg:
         obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
         msgList.append(obj)
-    return HttpResponse(json.dumps({'msgList': msgList}), content_type = "application/json")
+    return HttpResponse(json.dumps({'msgList': msgList, 'last_message_id': last_message_id}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):
