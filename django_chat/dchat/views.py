@@ -27,7 +27,7 @@ def sync(request):
     lastMessageIdList = []
     for i in dataDictionary['idList']:
         roomObj = Room.objects.get(id=i['chat_id'])
-        last_message_id = roomObj.last_message_id_list()    
+        last_message_id = roomObj.last_message_id_list()
         lastMessageIdList.append({'last_message_id': last_message_id, 'chat_id': roomObj.id})
     return HttpResponse(json.dumps({'lastMessageIdList': lastMessageIdList, 'status':True}), content_type = "application/json")
 
@@ -67,7 +67,7 @@ def join(request):
         roomObj.join(request.user)
     return HttpResponse('')
 
-@login_required 
+@login_required
 def leave(request):
     dataDictionary = json.loads(request.body)
     chatIdList = dataDictionary['chatIdList']
@@ -101,7 +101,7 @@ def get_create_chat_room_id(expert, author):
             cid.author = author
             cid.save()
             return cid
-def available_expert(expert, author): 
+def available_expert(expert, author):
     try:
         cid = One_to_one_chat.objects.filter(expert=expert)
         cid = cid[len(cid)-1]
@@ -141,7 +141,7 @@ def send_applicant_chat_id(request):
                 count = One_to_one_chat.objects.filter(expert=expert, status='o').count()
                 countList.append({'count': count, 'expert': expert})
             # expert = min(s['count'] for s in countList)
-            expert = min(countList, key=lambda k: k) 
+            expert = min(countList, key=lambda k: k)
             print '--------->', expert
             cid = One_to_one_chat(expert=expert['expert'], author=userObj, status='o')
             cid.save()
@@ -162,7 +162,7 @@ def send_expert_chat_id(request):
             roomObj = Room.objects.get_(obj)
             chatIdList.append({'chat_id': roomObj.id, 'username': obj.author.username})
         return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name,  "status":True}), content_type = "application/json")
-   
+
 
 ## Close chat room
 def closeChatRoom(request):
@@ -185,6 +185,7 @@ def loadEarlierMessages(request):
         offset = 0
 
     msg = roomObj.messages(offset)
+    msgList = []
     for i in msg:
         obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
         msgList.append(obj)
