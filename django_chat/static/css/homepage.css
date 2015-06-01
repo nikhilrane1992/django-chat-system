@@ -16,8 +16,8 @@ body{
 .chat-window{
     bottom:0;
     position:fixed;
-    float:right;
-    margin-left:10px;
+    /*float:right;*/
+    /*margin-left:10px;*/
 }
 .chat-window > div > .panel{
     border-radius: 5px 5px 0 0;
@@ -154,7 +154,7 @@ img {
     opacity: 0.3;
     color:#fff;
     text-align: center;
-    padding-top: 5px; 
-    cursor: pointer; 
+    padding-top: 5px;
+    cursor: pointer;
     cursor: hand;
 }
