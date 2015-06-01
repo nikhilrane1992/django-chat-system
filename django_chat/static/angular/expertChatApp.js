@@ -20,8 +20,8 @@
 				$scope.chat_room_id = response.data.chatIdList;
 				$scope.loginUser = response.data.user_name;
 
-				angular.forEach(response.data.chatIdList,function(obj){
-					createChatBox(obj.chat_id);
+				angular.forEach(response.data.chatIdList,function(id){
+					// createChatBox(id);
 				});
 
 				chat_join(response.data.chatIdList);
