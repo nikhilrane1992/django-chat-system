@@ -3,10 +3,11 @@
 {% block body %}
 {% load staticfiles%}
 <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'css/chat.css' %}" rel="stylesheet">
 <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
 {% verbatim %}
 
+<div class="row">
+<div class="col-sx-5">
 
 <div class="row" style="padding:0px;position:relative;">
 	<div class="col-xs-5 col-md-3 chat_list" style="position: fixed; bottom: 0px; max-height: 200px; left: 0px; padding-left: 0px; padding-right: 0px;">
@@ -17,7 +18,7 @@
 		</div>
 		<div class="panel-body" style="overflow-x: hidden;overflow-y: scroll;padding: 5px 0px 0px 15px;">
 			<ul style="list-style-type: none; padding-left: 0px;">
-				<li>
+				<li ng-repeat="user in chat_room_id">
 					<div class="row " style="padding:0px;">
 						<div class="col-xs-1">
 							<p style="width: 10px;height: 10px;-webkit-border-radius: 25px;
@@ -26,8 +27,8 @@
 						<div class="col-xs-1 avatar">
 							<img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
 						</div>
-						<div class="col-xs-5">
-							<p>Rahul</p>
+						<div class="col-xs-5" >
+							<p ng-click="createChatBox(user.chat_id)">{{user.username}}</p>
 						</div>
 					</div>
 				</li>
@@ -36,12 +37,16 @@
 	</div>
 </div>
 
-<div class="container" style="padding: 0px;">
+</div>
+
+<div class="col-sx-7">
+	<div class="container" style="padding: 0px;">
 
 
+	</div>    <!-- container -->
+</div>
 
-
-</div>    <!-- container -->
+</div>
 {% endverbatim %}
 
 

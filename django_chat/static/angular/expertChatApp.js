@@ -151,7 +151,7 @@
 		// 	clone.removeAttr('id');
 		// }
 
-		var createChatBox = function(id) {
+		$scope.createChatBox = function(id) {
 			$log.debug("box id: " + id);
 			var size = $(".chat-window:last-child" ).css("margin-left");
 			$log.debug("size: "+ size);
