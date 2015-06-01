@@ -11,13 +11,14 @@
 	<div id="sidebar" class="sidebar-offcanvas">
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-stacked">
-				<li class="active"><a href="#">Online</a></li>
-				<li ng-repeat="user in chat_room_id" style="border-bottom:2px solid #EEE;">
-					<div class="row" ng-click="createChatBox(user.chat_id)">
+				<li class="active"><a href="#" style="margin-left: -10px; margin-right: -10px;">Online</a></li>
+				<li ng-repeat="user in chat_room_id" style="border-bottom:2px solid #EEE;"
+					data-app-bind-html="user.template">
+					<div class="row">
 						<div class="col-xs-2" style="padding:5px;">
 							<img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
 						</div>
-						<div class="col-xs-8" style="padding:5px;">
+						<div class="col-xs-8" style="padding:5px;" ng-click="createChatBox(user.chat_id);">
 							<p>{{user.username}}</p>
 						</div>
 						<div class="col-xs-1" style="padding:10px;">
@@ -36,8 +37,8 @@
 				<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas"><i class="glyphicon glyphicon-chevron-left"></i></button>
 			</p>
 			<div class="row">
-				<div class="col-md-12">
-					<div class="container">
+				<div class="col-xs-12">
+					<div class="container chat_container">
 
 					</div>
 				</div>
