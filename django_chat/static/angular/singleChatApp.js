@@ -96,13 +96,13 @@
 					// $scope.last_received.push(lastReceivedObject);
 					// $log.debug($scope.last_received);
 				});
-});
+		});
 
 
-$timeout(function(){$scope.get_messages();}, 5000);
-}
+		$timeout(function(){$scope.get_messages();}, 5000);
+		}
 
-var sync_messages = function(idList) {
+		var sync_messages = function(idList) {
 
 			// $scope.chat_room_id = parseInt($scope.chat_room_id);
 
