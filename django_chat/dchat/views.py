@@ -26,7 +26,7 @@ def sync(request):
         raise Http404
     lastMessageIdList = []
     for i in dataDictionary['idList']:
-        roomObj = Room.objects.get(id=i)
+        roomObj = Room.objects.get(id=i['chat_id'])
         lastMsgId = roomObj.last_message_id()    
         lastMessageIdList.append({'last_message_id':lastMsgId, 'chat_id': roomObj.id})
     return HttpResponse(json.dumps({'lastMessageIdList': lastMessageIdList, 'status':True}), content_type = "application/json")
@@ -64,7 +64,7 @@ def join(request):
     dataDictionary = json.loads(request.body)
     chatIdList = dataDictionary['chatIdList']
     for i in chatIdList:
-        roomObj = Room.objects.get(id=int(i))
+        roomObj = Room.objects.get(id=int(i['chat_id']))
         roomObj.join(request.user)
     return HttpResponse('')
 
@@ -148,12 +148,12 @@ def send_applicant_chat_id(request):
             cid.save()
         roomObj = Room.objects.get_or_create(cid)
         user_name = request.user.username.strip()
-        return HttpResponse(json.dumps({"chatIdList": [roomObj.id], "user_name": user_name,  "status":True}), content_type = "application/json")
+        return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name}], "user_name": user_name,  "status":True}), content_type = "application/json")
 
 
 def send_expert_chat_id(request):
     expertObj = User.objects.get(id=request.user.id)
-    cidobjList = One_to_one_chat.objects.filter(expert=expertObj)
+    cidobjList = One_to_one_chat.objects.filter(expert=expertObj, status='o')
     user_name = request.user.username.strip()
     if len(cidobjList) == 0:
         return HttpResponse(json.dumps({"chatIdList": '', "user_name": user_name,  "status":True}), content_type = "application/json")

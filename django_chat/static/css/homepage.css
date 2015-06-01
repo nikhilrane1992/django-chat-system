@@ -132,3 +132,17 @@ img {
     left:0px;
     bottom:0;
 }
+
+
+.load_earlier_message{
+    background-color: #000;
+    vertical-align:top;
+    height: 30px;
+    width: 100%;
+    opacity: 0.3;
+    color:#fff;
+    text-align: center;
+    padding-top: 5px; 
+    cursor: pointer; 
+    cursor: hand;
+}
