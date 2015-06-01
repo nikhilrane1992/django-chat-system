@@ -74,7 +74,8 @@ class Room(models.Model):
         '''Return last message sent to room'''
         m = Message.objects.filter(room=self).order_by('-pk')
         if m:
-            return m[0].id
+            mList = []
+            return [mList.append(i.id) for i in m]
         else:
             return 0
 
