@@ -70,12 +70,15 @@ class Room(models.Model):
             m = m.filter(timestamp__gte=after_date)
         return m.order_by('pk')
 
-    def last_message_id(self):
+    def last_message_id_list(self):
         '''Return last message sent to room'''
         m = Message.objects.filter(room=self).order_by('-pk')
         if m:
             mList = []
-            return [mList.append(i.id) for i in m]
+            m = m[:10]
+            [mList.append(i.id) for i in m]
+            last_message_id = min(mList)
+            return last_message_id
         else:
             return 0
 

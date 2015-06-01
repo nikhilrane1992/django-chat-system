@@ -109,7 +109,6 @@
 			$http.post('/chat/sync/',{idList:idList}).then(function (response) {
 				$log.debug(response.data);
 				$scope.last_received = response.data.lastMessageIdList;
-
 			});
 
 			$timeout(function(){$scope.get_messages();}, 5000);
@@ -201,6 +200,14 @@
 		});
 
 		$(document).on('click', '.btn_chat', function (e) {
+
+			var id = $(this).val();
+			var msg = $(this).closest('span').prev('input.message').val();
+
+			sendMessage(msg,id);
+		});
+
+		$(document).on('click', '.load_earlier_message', function (e) {
 
 			var id = $(this).val();
 			var msg = $(this).closest('span').prev('input.message').val();

@@ -27,8 +27,8 @@ def sync(request):
     lastMessageIdList = []
     for i in dataDictionary['idList']:
         roomObj = Room.objects.get(id=i['chat_id'])
-        lastMsgId = roomObj.last_message_id()    
-        lastMessageIdList.append({'last_message_id':lastMsgId, 'chat_id': roomObj.id})
+        last_message_id = roomObj.last_message_id_list()    
+        lastMessageIdList.append({'last_message_id': last_message_id, 'chat_id': roomObj.id})
     return HttpResponse(json.dumps({'lastMessageIdList': lastMessageIdList, 'status':True}), content_type = "application/json")
 
 @login_required
@@ -47,12 +47,11 @@ def receive(request):
             raise Http404
 
         try:
-            offset = int(obj['last_message_id'])
+            offset = obj['last_message_id']
         except:
             offset = 0
 
         roomObj = Room.objects.get(id=room_id)
-
         msg = roomObj.messages(offset)
         for i in msg:
             obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
