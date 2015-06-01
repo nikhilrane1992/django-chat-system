@@ -72,8 +72,8 @@ class Room(models.Model):
 
     def load_earlier_messages(self, after_pk=None, after_date=None):
         m = Message.objects.filter(room=self)
+        before_pk = after_pk - 10
         if after_pk:
-            before_pk = after_pk - 10
             if before_pk < 0:
                 before_pk = 0
             m = m.filter(pk__gt=before_pk)[:10]
