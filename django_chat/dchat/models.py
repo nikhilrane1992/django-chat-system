@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.contrib.contenttypes import generic
 from datetime import datetime
+from time import time
 
 class RoomManager(models.Manager):
     '''Custom model manager for rooms, this is used for "table-level" operations.
@@ -72,12 +73,15 @@ class Room(models.Model):
 
     def load_earlier_messages(self, after_pk=None, after_date=None):
         m = Message.objects.filter(room=self)
+        print 'after_pk-->', self, after_pk, after_date
         if after_pk:
             before_pk = after_pk - 10
+            print 'before_pk-->', before_pk
             if before_pk < 0:
                 before_pk = 0
-            m = m.filter(pk__gt=before_pk)[:10]
-            return m.order_by('-pk'), before_pk
+            m = m.filter(pk__gt=before_pk).order_by('-pk')[:10]
+            print 'm--->',m
+            return m, before_pk
         if after_date:
             m = m.filter(timestamp__gte=after_date)
             return m.order_by('-pk')
@@ -141,4 +145,12 @@ class One_to_one_chat(models.Model):
     author = models.ForeignKey(User, related_name='user', blank=True, null=True)
     status = models.CharField(max_length=1, choices=CHAT_ROOM_STATUS)
 
-        
+
+def get_upload_file_name(instance, filename):
+    return "appliant_profile_photo/%s_%s" %(filename, str(time()).replace('.','_'))
+
+class Applicant(models.Model):
+    thumbnail = models.FileField(upload_to=get_upload_file_name, blank=True, null=True)
+    applicant = models.ForeignKey(User, related_name='applicant', blank=True, null=True)
+    def __unicode__(self):
+        return "Applicant Name: " + self.applicant.username
