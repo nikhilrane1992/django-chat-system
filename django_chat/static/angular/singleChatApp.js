@@ -109,10 +109,10 @@
 			$http.post('/chat/sync/',{idList:idList}).then(function (response) {
 				$log.debug(response.data);
 				$scope.last_received = response.data.lastMessageIdList;
-				$('.load_earlier_message').val($scope.last_received[0].last_message_id);
+				$('.load_earlier_message').val($scope.last_received[0].last_message_id+"_"+$scope.last_received[0].chat_id);
+				$scope.get_messages();
 			});
 
-			$timeout(function(){$scope.get_messages();}, 5000);
 		};
 
 
@@ -160,17 +160,41 @@
 		 	$http.post('/chat/leave/',{chatIdList:$scope.chat_room_id}).then(function (response) {
 
 		 	});
-		 }
+		 };
 
-		// for(var i = 0; i < 2; i++ ){
-		// 	var size = $( ".chat-window:last-child" ).css("margin-left");
-		// 	size_total = parseInt(size) + 400;
-		// 	// alert(size_total);
-		// 	var clone = $( ".chat-window" ).clone().appendTo( ".container" );
-		// 	clone.css("margin-left", size_total);
-		// 	clone.addClass("new_"+i);
-		// 	clone.removeAttr('id');
-		// }
+		var loadEarlierMessages = function(lastMsgId,chatId) {
+			lastMsgId = parseInt(lastMsgId);
+			chatId = parseInt(chatId);
+
+			$http.post('/chat/load/earlier/message/',{chatRoomId:chatId,last_message_id:lastMsgId}).then(function (response) {
+				$log.debug(response.data);
+				angular.forEach(response.data.msgList, function(obj) {
+
+					$('.load_earlier_message').remove();
+
+					$('.msg_container_base_'+obj.chat_id).css("overflo");
+					if (obj.type == 's')
+						$('.msg_container_base_'+obj.chat_id).prepend('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">Timothy • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
+					else if (obj.type == 'm'){
+						if(obj.author == $scope.loginUser){
+							$('.msg_container_base_'+obj.chat_id).prepend('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div></div>');
+						}else{
+							$('.msg_container_base_'+obj.chat_id).prepend('<div class="row msg_container base_receive"><div class="col-md-2 col-xs-2 avatar"><img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive "></div><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_receive"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div></div>');
+						}
+					}
+					else if (obj.type == 'j')
+						$('.msg_container_base_'+obj.chat_id).prepend('<div class="join" style:"color:#960;padding-left:20px;margin:4px 0;">'+obj.author+' has joined</div>');
+					else if (obj.type == 'l')
+						$('.msg_container_base_'+obj.chat_id).prepend('<div class="leave" style:"color:#966;padding-left:20px;margin:4px 0;">'+obj.author+' has left</div>');
+
+						$('.msg_container_base_'+obj.chat_id).prepend('<div class="load_earlier_message"><p>LOAD EARLIER MESSAGES</p></div>');
+
+		 		});
+
+				$('.load_earlier_message').val(response.data.last_message_id+"_"+response.data.chatRoomId);
+
+		 	});
+		};
 
 		var createChatBox = function(id) {
 			$log.debug("box id: " + id);
@@ -212,9 +236,11 @@
 
 			var id = $(this).val();
 			alert(id);
-			var msg = $(this).closest('span').prev('input.message').val();
-
-			$scope.get_messages();
+			lastMsgId = id.split("_");
+			// lastMsgId = id.split("_")[1];
+			last_msg_id = lastMsgId[0];
+			chatId = lastMsgId[1];
+			loadEarlierMessages(last_msg_id,chatId);
 		});
 
 
