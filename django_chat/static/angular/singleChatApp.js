@@ -1,11 +1,13 @@
 (function(){
 	var chatApp = angular.module('singleChatApp',[]);
+
 	chatApp.controller('singleChatCtrl', ['$scope', '$log', '$http', '$timeout', '$compile', function($scope, $log, $http, $timeout, $compile){
 
-		// $(window).unload(function(){chat_leave()});
-		window.onbeforeunload = function() {
-			    chat_leave();
-			}
+
+		$(window).unload(function(){chat_leave()});
+		// window.onbeforeunload = function() {
+		// 	    chat_leave();
+		// 	}
 
 		$scope.messageToSend = "";
 		$scope.chat_room_id = [];
@@ -42,6 +44,15 @@
 				});
 			}
 		};
+
+		$(document).on('keypress', '.message', function (e) {
+		  if (e.which == 13) {
+		    var msg = $(this).val();
+			var id = $(this).next('span').find('button.btn_chat').val();
+			sendMessage(msg,id);
+		  }
+		  // e.preventDefault();
+		});
 
 		$scope.get_messages = function() {
 			$log.debug("before sent: ");
@@ -107,17 +118,24 @@ var sync_messages = function(idList) {
 
 		// emoticons
 		var emoticons = {
-			'>:D' : 'emoticon_evilgrin.png',
-			':D' : 'emoticon_grin.png',
-			'=D' : 'emoticon_happy.png',
-			':\\)' : 'emoticon_smile.png',
-':O' : 'emoticon_surprised.png',
-':P' : 'emoticon_tongue.png',
-':\\(' : 'emoticon_unhappy.png',
-	':3' : 'emoticon_waii.png',
-	';\\)' : 'emoticon_wink.png',
-'\\(ball\\)' : 'sport_soccer.png'
-}
+			':\\)' : 'smile.png',
+			'=\\)':'smile3.png',
+			':]':'smile2.png',
+			':-\\)':'smile1.png',
+			';-\\);\\)':'wink.png',
+			':-D=D':'grin.png',
+			'O:\\)O:-\\)':'angel.png',
+			':O:-o:o':'gasp.png',
+			':-O':'gasp1.png',
+			':D':'grin1.png',
+			'^_^':'kiki.png',
+			'._.':'squint.png',
+			'B':'sunglass.png',
+			'3\\)':'devilsmile.png',
+			// '\\>:(\\>:-(':'grumpy.png',
+			':3':'curlylips.png',
+			// ':-(:(:[':'frown.png'
+			}
 
 		/**
 		 * Regular expression maddness!!!
@@ -127,7 +145,7 @@ var sync_messages = function(idList) {
 		 	$.each(emoticons, function(char, img) {
 		 		re = new RegExp(char,'g');
 				// replace the following at will
-				text = text.replace(re, '<img src="/media/img/silk/'+img+'" />');
+				text = text.replace(re, '<img src="/static/images/emoticons/'+img+'" style="width:15px;" />');
 			});
 		 	return text;
 		 }

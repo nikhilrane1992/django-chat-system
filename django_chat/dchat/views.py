@@ -8,6 +8,8 @@ from django.template import RequestContext
 from django.contrib.auth.models import User, Group
 import json
 from models import Room, Message, One_to_one_chat
+from django.contrib.sessions.models import Session
+from django.utils import timezone
 
 @login_required
 def send(request):
@@ -80,34 +82,6 @@ def leave(request):
         oneToOneChatObj.save()
     return HttpResponse('')
 
-def jsonify(object, fields=None, to_dict=False):
-    try:
-        import json
-    except ImportError:
-        import django.utils.simplejson as json
-
-    out = []
-
-    if type(object) not in [dict,list,tuple] :
-        for i in object:
-            tmp = {}
-            if fields:
-                for field in fields:
-                    tmp[field] = unicode(i.__getattribute__(field))
-            else:
-                for attr, value in i.__dict__.iteritems():
-                    tmp[attr] = value
-            out.append(tmp)
-    else:
-        out = object
-
-    if to_dict:
-        return out
-    else:
-        return json.dumps(out)
-
-
-
 def usergroup_index(request, group_id):
     group = UserGroup.models.get(id=group_id)
     room = Room.objects.get_or_create(group)
@@ -138,26 +112,40 @@ def available_expert(expert, author):
         cid.save()
     return cid
 
+def get_all_logged_in_users():
+    # Query all non-expired sessions
+    # use timezone.now() instead of datetime.now() in latest versions of Django
+    sessions = Session.objects.filter(expire_date__gte=timezone.now())
+    uid_list = []
+
+    # Build a list of user ids from that query
+    for session in sessions:
+        data = session.get_decoded()
+        uid_list.append(data.get('_auth_user_id', None))
+
+    # Query all logged in users based on id list
+    return User.objects.filter(id__in=uid_list, groups__name='EXPERT')
+
 def send_applicant_chat_id(request):
-    group = Group.objects.get(name="EXPERT")
-    expertList = group.user_set.all()
-    loggedInExpertsList = []
-    for expert in expertList:
-        if expert.is_authenticated():
-            loggedInExpertsList.append(expert)
+    loggedInExpertsList = get_all_logged_in_users()
+    print loggedInExpertsList
     userObj = User.objects.get(id=request.user.id)
     if len(loggedInExpertsList) == 0:
-        return HttpResponse(json.dumps({"chat_id": '', "user_name": user_name,  "status":True}), content_type = "application/json")
+        return HttpResponse(json.dumps({"validation": 'No expert available at this time might be busy in another chats', "status":True}), content_type = "application/json")
     else:
         try:
             cid = One_to_one_chat.objects.get(author=userObj, status='o')
         except Exception, e:
             print e
+            countList = []
             for expert in loggedInExpertsList:
                 count = One_to_one_chat.objects.filter(expert=expert, status='o').count()
-                if count < 4:
-                    cid = One_to_one_chat(expert=loggedInExpertsList[0], author=userObj, status='o')
-                    cid.save()
+                countList.append({'count': count, 'expert': expert})
+            # expert = min(s['count'] for s in countList)
+            expert = min(countList, key=lambda k: k) 
+            print '--------->', expert
+            cid = One_to_one_chat(expert=expert['expert'], author=userObj, status='o')
+            cid.save()
         roomObj = Room.objects.get_or_create(cid)
         user_name = request.user.username.strip()
         return HttpResponse(json.dumps({"chatIdList": [roomObj.id], "user_name": user_name,  "status":True}), content_type = "application/json")
@@ -173,7 +161,7 @@ def send_expert_chat_id(request):
         chatIdList = []
         for obj in cidobjList:
             roomObj = Room.objects.get_(obj)
-            chatIdList.append(roomObj.id)
+            chatIdList.append({'chat_id': roomObj.id, 'username': obj.author.username})
         return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name,  "status":True}), content_type = "application/json")
    
 
