@@ -74,10 +74,12 @@ class Room(models.Model):
         m = Message.objects.filter(room=self)
         if after_pk:
             before_pk = after_pk - 10
+            if before_pk < 0:
+                before_pk = 0
             m = m.filter(pk__gt=before_pk)[:10]
         if after_date:
             m = m.filter(timestamp__gte=after_date)
-        return m.order_by('-pk')
+        return m.order_by('-pk'), before_pk
 
 
     def last_message_id_list(self):
