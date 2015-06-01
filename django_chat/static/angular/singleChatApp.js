@@ -190,6 +190,9 @@
 						$('.msg_container_base_'+obj.chat_id).prepend('<div class="load_earlier_message"><p>LOAD EARLIER MESSAGES</p></div>');
 
 		 		});
+
+				$('.load_earlier_message').val(response.data.last_message_id+"_"+response.data.chatRoomId);
+
 		 	});
 		};
 
