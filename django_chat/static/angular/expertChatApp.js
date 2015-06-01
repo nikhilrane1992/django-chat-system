@@ -104,30 +104,37 @@
 
 		// emoticons
 		var emoticons = {
-			'>:D' : 'emoticon_evilgrin.png',
-			':D' : 'emoticon_grin.png',
-			'=D' : 'emoticon_happy.png',
-			':\\)' : 'emoticon_smile.png',
-			':O' : 'emoticon_surprised.png',
-			':P' : 'emoticon_tongue.png',
-			':\\(' : 'emoticon_unhappy.png',
-			':3' : 'emoticon_waii.png',
-			';\\)' : 'emoticon_wink.png',
-			'\\(ball\\)' : 'sport_soccer.png'
-		}
+			':\\)' : 'smile.png',
+			'=\\)':'smile3.png',
+			':]':'smile2.png',
+			':-\\)':'smile1.png',
+			';-\\);\\)':'wink.png',
+			':-D=D':'grin.png',
+			'O:\\)O:-\\)':'angel.png',
+			':O:-o:o':'gasp.png',
+			':-O':'gasp1.png',
+			':D':'grin1.png',
+			'^_^':'kiki.png',
+			'._.':'squint.png',
+			'B':'sunglass.png',
+			'3\\)':'devilsmile.png',
+			// '\\>:(\\>:-(':'grumpy.png',
+			':3':'curlylips.png',
+			// ':-(:(:[':'frown.png'
+			}
 
 		/**
 		 * Regular expression maddness!!!
 		 * Replace the above strings for their img counterpart
 		 */
-		function replace_emoticons(text) {
-			$.each(emoticons, function(char, img) {
-				re = new RegExp(char,'g');
+		 function replace_emoticons(text) {
+		 	$.each(emoticons, function(char, img) {
+		 		re = new RegExp(char,'g');
 				// replace the following at will
-				text = text.replace(re, '<img src="/media/img/silk/'+img+'" />');
+				text = text.replace(re, '<img src="/static/images/emoticons/'+img+'" style="width:15px;" />');
 			});
-			return text;
-		}
+		 	return text;
+		 }
 
 		function chat_join(idList) {
 			$http.post('/chat/join/',{chatIdList:$scope.chat_room_id}).then(function (response) {
@@ -151,28 +158,22 @@
 		// 	clone.removeAttr('id');
 		// }
 
-		$scope.createChatBox = function(id) {
+		$scope.createChatBox = function(id,userName) {
+
 			$log.debug("box id: " + id);
-
-			for(var i = 0; i < $scope.chat_room_id.length; i++){
-				if ($('#myElement').length > 0) {
-
-				}
-
-			}
 
 			var size = $(".chat-window:last-child" ).css("margin-left");
 			$log.debug("size: "+ size);
 
 			if(angular.isUndefined(size)){
 				$log.debug("if undefined");
-				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1" value="'+id+'"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp; '+ userName+'</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1" value="'+id+'"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 				// $compile(chatBox)($scope);
 			}else{
 				$log.debug("Not undefined");
 				var size_total = parseInt(size) + 400;
 				$log.debug("Margin Size : " + size_total);
-				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1" value="'+id+'"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+				var chatBox = '<div class="row chat-window col-xs-12 col-sm-5 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp; '+userName+'</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" data-id="chat_window_1" value="'+id+'"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" value="" placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 				// $compile(chatBox)($scope);
 			}
 			$(".chat_container").append(chatBox);
@@ -197,6 +198,16 @@
 
 			sendMessage(msg,id);
 
+		});
+
+
+		$(document).on('keypress', '.message', function (e) {
+		  if (e.which == 13) {
+		    var msg = $(this).val();
+			var id = $(this).next('span').find('button.btn_chat').val();
+			sendMessage(msg,id);
+		  }
+		  // e.preventDefault();
 		});
 
 	}]); //controller ends
