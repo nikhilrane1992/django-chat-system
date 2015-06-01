@@ -1,7 +1,53 @@
-body{
-    height:400px;
-    position: fixed;
-    bottom: 0;
+body,html,.row-offcanvas {
+  height:100%;
+}
+
+body {
+  padding-top: 50px;
+}
+
+#sidebar {
+  width: inherit;
+  min-width: 220px;
+  max-width: 220px;
+  background-color:#f5f5f5;
+  float: left;
+  height:100%;
+  position:relative;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+#main {
+  height:100%;
+  overflow:auto;
+}
+
+/*
+ * off Canvas sidebar
+ * --------------------------------------------------
+ */
+ @media screen and (max-width: 768px) {
+  .row-offcanvas {
+    position: relative;
+    -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
+    width:calc(100% + 220px);
+}
+
+.row-offcanvas-left
+{
+    left: -220px;
+}
+
+.row-offcanvas-left.active {
+    left: 0;
+}
+
+.sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+}
 }
 .avatar, .chat-window-body{
     padding:0;
@@ -24,22 +70,22 @@ body{
 }
 /*.icon_minim{
     padding:2px 10px;
-}*/
-.msg_container_base{
-  background: #e5e5e5;
-  margin: 0;
-  padding: 0 10px 10px;
-  max-height:300px;
-  overflow-x:hidden;
-}
-.top-bar {
-  background: #666;
-  color: white;
-  padding: 10px;
-  position: relative;
-  overflow: hidden;
-}
-.msg_receive{
+    }*/
+    .msg_container_base{
+      background: #e5e5e5;
+      margin: 0;
+      padding: 0 10px 10px;
+      max-height:300px;
+      overflow-x:hidden;
+  }
+  .top-bar {
+      background: #666;
+      color: white;
+      padding: 10px;
+      position: relative;
+      overflow: hidden;
+  }
+  .msg_receive{
     padding-left:0;
     margin-left:0;
 }
@@ -57,7 +103,7 @@ body{
 .messages > p {
     font-size: 13px;
     margin: 0 0 0.2rem 0;
-  }
+}
 .messages > time {
     font-size: 11px;
     color: #ccc;
@@ -157,4 +203,17 @@ img {
     padding-top: 5px;
     cursor: pointer;
     cursor: hand;
+}
+
+.navbar-brand-centered {
+    position: absolute;
+    left: 50%;
+    display: block;
+    width: 160px;
+    text-align: center;
+    background-color: transparent;
+}
+.navbar>.container .navbar-brand-centered,
+.navbar>.container-fluid .navbar-brand-centered {
+    margin-left: -80px;
 }
