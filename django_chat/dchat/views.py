@@ -162,7 +162,7 @@ def send_applicant_chat_id(request):
             print e
             profile_pic = '/Media/appliant_profile_photo/default.jpg'
         return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name, 'profile_pic': profile_pic, 'last_message_id': 2}],
-            "user_name": user_name, "user_id": request.user.id, "status":True}), content_type = "application/json")
+            "user_name": user_name, 'expert_name': cid.expert.username, 'last_message_id': 2, "user_id": request.user.id, "status":True}), content_type = "application/json")
 
 
 def send_expert_chat_id(request):
