@@ -181,7 +181,8 @@ def send_expert_chat_id(request):
                 print e
                 profile_pic = '/Media/appliant_profile_photo/default.jpg'
             roomObj = Room.objects.get_(obj)
-            chatIdList.append({'chat_id': roomObj.id, 'username': obj.author.username, 'profile_pic': profile_pic})
+            last_message_id = roomObj.last_message_id_list()
+            chatIdList.append({'last_message_id': last_message_id, 'chat_id': roomObj.id, 'username': obj.author.username, 'profile_pic': profile_pic})
         return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name, 'user_id': request.user.id, 'profile_pic': profile_pic, "status":True}), content_type = "application/json")
 
 
