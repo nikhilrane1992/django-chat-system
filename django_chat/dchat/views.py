@@ -161,8 +161,8 @@ def send_applicant_chat_id(request):
         except Exception, e:
             print e
             profile_pic = '/Media/appliant_profile_photo/default.jpg'
-        return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name, 'profile_pic': profile_pic}], 
-            "user_name": user_name, "user_id": request.user.id,"status":True}), content_type = "application/json")
+        return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name, 'profile_pic': profile_pic, 'last_message_id': 2}],
+            "user_name": user_name, "user_id": request.user.id, "status":True}), content_type = "application/json")
 
 
 def send_expert_chat_id(request):
@@ -182,7 +182,7 @@ def send_expert_chat_id(request):
                 profile_pic = '/Media/appliant_profile_photo/default.jpg'
             roomObj = Room.objects.get_(obj)
             last_message_id = roomObj.last_message_id_list()
-            chatIdList.append({'last_message_id': last_message_id, 'chat_id': roomObj.id, 'username': obj.author.username, 'profile_pic': profile_pic})
+            chatIdList.append({'last_message_id': 2, 'chat_id': roomObj.id, 'username': obj.author.username, 'profile_pic': profile_pic})
         return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name, 'user_id': request.user.id, 'profile_pic': profile_pic, "status":True}), content_type = "application/json")
 
 
@@ -202,12 +202,14 @@ def loadEarlierMessages(request):
     chatRoomId = dataDictionary['chatRoomId']
     roomObj = Room.objects.get(id=chatRoomId)
     try:
-        offset = int(dataDictionary['last_message_id']) 
+        offset = int(dataDictionary['last_message_id'])
     except Exception, e:
         print e
         offset = 0
 
-    msg, last_message_id = roomObj.load_earlier_messages(offset)
+    msg, pageNo = roomObj.load_earlier_messages(offset)
+    if msg == False:
+        return HttpResponse(json.dumps({'validation': 'No msg to display', 'last_message_id': pageNo, 'chatRoomId': roomObj.id, 'status': False}), content_type = "application/json")
     msgList = []
     for i in msg:
         try:
@@ -219,7 +221,7 @@ def loadEarlierMessages(request):
 
         obj = {'id': i.id, 'author': i.author.username, 'profile_pic': profile_pic, 'message': i.message, 'type': i.type, 'chat_id': i.room.id}
         msgList.append(obj)
-    return HttpResponse(json.dumps({'msgList': msgList, 'last_message_id': last_message_id, 'chatRoomId': roomObj.id}), content_type = "application/json")
+    return HttpResponse(json.dumps({'msgList': msgList, 'last_message_id': pageNo, 'chatRoomId': roomObj.id}), content_type = "application/json")
 
 ## view for display home page
 def homePage(request):

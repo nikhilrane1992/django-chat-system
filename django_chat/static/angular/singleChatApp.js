@@ -13,6 +13,7 @@
 		$scope.chat_room_id = [];
 		$scope.last_received = [];
 		$scope.loginUser = "";
+		$scope.loginUserId = "";
 		$scope.init = function () {
 			$log.debug("Hello guest");
 			getChatIdFromServer();
@@ -24,11 +25,14 @@
 				$log.debug(response.data);
 				$scope.chat_room_id = response.data.chatIdList;
 				$scope.loginUser = response.data.user_name;
-
+				$scope.loginUserId = response.data.user_id;
+				alert(response.data.chatIdList[0].last_message_id);
+				alert(response.data.chatIdList[0].chat_id);
 				angular.forEach(response.data.chatIdList,function(obj){
 					createChatBox(obj.chat_id);
 				});
 
+				$('.load_earlier_message').data("id",response.data.chatIdList[0].last_message_id+"_"+response.data.chatIdList[0].chat_id);
 				chat_join(response.data.chatIdList);
 
 			});
@@ -71,10 +75,10 @@
 					if (obj.type == 's')
 						$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">Timothy • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="'+obj.profile_pic+'" class=" img-responsive "></div></div>');
 					else if (obj.type == 'm'){
-						if(obj.author == $scope.loginUser){
+						if(obj.author_id == $scope.loginUserId){
 							$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_sent"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div><div class="col-md-2 col-xs-2 avatar"><img src="'+obj.profile_pic+'" class=" img-responsive "></div></div>');
-							$('.msg_container_base_'+obj.chat_id).append('<audio id="chatAudio"><source src="/static/Pling.wav" type="audio/wav"></audio>');
-							$('#chatAudio')[0].play();
+							// $('.msg_container_base_'+obj.chat_id).append('<audio id="chatAudio"><source src="/static/Pling.wav" type="audio/wav"></audio>');
+							// $('#chatAudio')[0].play();
 						}else{
 							$('.msg_container_base_'+obj.chat_id).append('<div class="row msg_container base_receive"><div class="col-md-2 col-xs-2 avatar"><img src="'+obj.profile_pic+'" class=" img-responsive "></div><div class="col-md-10 col-xs-10 chat-window-body"><div class="messages msg_receive"><p>'+ replace_emoticons(obj.message) +'</p><time datetime="2009-11-13T20:00">'+obj.author+' • 51 min</time></div></div></div>');
 							$('.msg_container_base_'+obj.chat_id).append('<audio id="chatAudio"><source src="/static/Pling.wav" type="audio/wav"></audio>');
@@ -113,7 +117,6 @@
 			$http.post('/chat/sync/',{idList:idList}).then(function (response) {
 				$log.debug(response.data);
 				$scope.last_received = response.data.lastMessageIdList;
-				$('.load_earlier_message').val($scope.last_received[0].last_message_id+"_"+$scope.last_received[0].chat_id);
 				$scope.get_messages();
 			});
 
@@ -172,8 +175,8 @@
 
 			$http.post('/chat/load/earlier/message/',{chatRoomId:chatId,last_message_id:lastMsgId}).then(function (response) {
 				$log.debug(response.data);
-				angular.forEach(response.data.msgList, function(obj) {
 
+				angular.forEach(response.data.msgList, function(obj) {
 					$('.load_earlier_message').remove();
 
 					$('.msg_container_base_'+obj.chat_id).css("overflo");
@@ -192,10 +195,14 @@
 						$('.msg_container_base_'+obj.chat_id).prepend('<div class="leave" style:"color:#966;padding-left:20px;margin:4px 0;">'+obj.author+' has left</div>');
 
 						$('.msg_container_base_'+obj.chat_id).prepend('<div class="load_earlier_message"><p>LOAD EARLIER MESSAGES</p></div>');
-
 		 		});
 
-				$('.load_earlier_message').val(response.data.last_message_id+"_"+response.data.chatRoomId);
+				if(response.data.status == false){
+					$('.load_earlier_message').remove();
+				}else{
+					$('.load_earlier_message').data("id",response.data.last_message_id+"_"+response.data.chatRoomId);
+				}
+
 
 		 	});
 		};
@@ -238,7 +245,7 @@
 
 		$(document).on('click', '.load_earlier_message', function (e) {
 
-			var id = $(this).val();
+			var id = $(this).data("id");
 			alert(id);
 			lastMsgId = id.split("_");
 			// lastMsgId = id.split("_")[1];

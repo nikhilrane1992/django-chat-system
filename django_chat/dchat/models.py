@@ -10,7 +10,7 @@ class RoomManager(models.Manager):
     All methods defined here can be invoked through the Room.objects class.
     @see: http://docs.djangoproject.com/en/1.0/topics/db/managers/#topics-db-managers
     Also see GenericTypes from the contenttypes django app!
-    @see: http://docs.djangoproject.com/en/1.0/ref/contrib/contenttypes/''' 
+    @see: http://docs.djangoproject.com/en/1.0/ref/contrib/contenttypes/'''
 
     def create(self, object):
         '''Creates a new chat room and registers it to the calling object'''
@@ -71,21 +71,16 @@ class Room(models.Model):
             m = m.filter(timestamp__gte=after_date)
         return m.order_by('pk')
 
-    def load_earlier_messages(self, after_pk=None, after_date=None):
-        m = Message.objects.filter(room=self)
-        print 'after_pk-->', self, after_pk, after_date
-        if after_pk:
-            before_pk = after_pk - 10
-            print 'before_pk-->', before_pk
-            if before_pk < 0:
-                before_pk = 0
-            m = m.filter(pk__gt=before_pk).order_by('-pk')[:10]
-            print 'm--->',m
-            return m, before_pk
-        if after_date:
-            m = m.filter(timestamp__gte=after_date)
-            return m.order_by('-pk')
-
+    def load_earlier_messages(self, pageNo=None, after_date=None):
+        entriesPerPage=10
+        excludePageentries = (pageNo - 1) * entriesPerPage
+        nextPageentries = excludePageentries + entriesPerPage
+        m = Message.objects.filter(room=self).order_by('-pk')[excludePageentries:nextPageentries]
+        if len(m) == 0:
+            return False, pageNo
+        else:
+            pageNo = pageNo + 1
+            return m, pageNo
 
     def last_message_id_list(self):
         '''Return last message sent to room'''
