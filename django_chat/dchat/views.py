@@ -61,7 +61,7 @@ def receive(request):
             except Exception, e:
                 print e
                 profile_pic = '/Media/appliant_profile_photo/default.jpg'
-            obj = {'id': i.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id, 'profile_pic': profile_pic}
+            obj = {'id': i.id, 'author_id': i.author.id, 'author': i.author.username, 'message': i.message, 'type': i.type, 'chat_id': i.room.id, 'profile_pic': profile_pic}
             msgList.append(obj)
     return HttpResponse(json.dumps({'msgList': msgList}), content_type = "application/json")
 
@@ -162,7 +162,7 @@ def send_applicant_chat_id(request):
             print e
             profile_pic = '/Media/appliant_profile_photo/default.jpg'
         return HttpResponse(json.dumps({"chatIdList": [{'chat_id': roomObj.id, 'username': user_name, 'profile_pic': profile_pic}], 
-            "user_name": user_name, "status":True}), content_type = "application/json")
+            "user_name": user_name, "user_id": request.user.id,"status":True}), content_type = "application/json")
 
 
 def send_expert_chat_id(request):
@@ -182,7 +182,7 @@ def send_expert_chat_id(request):
                 profile_pic = '/Media/appliant_profile_photo/default.jpg'
             roomObj = Room.objects.get_(obj)
             chatIdList.append({'chat_id': roomObj.id, 'username': obj.author.username, 'profile_pic': profile_pic})
-        return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name, 'profile_pic': profile_pic, "status":True}), content_type = "application/json")
+        return HttpResponse(json.dumps({"chatIdList": chatIdList, "user_name": user_name, 'user_id': request.user.id, 'profile_pic': profile_pic, "status":True}), content_type = "application/json")
 
 
 ## Close chat room
