@@ -43,10 +43,6 @@
 			$http.post('/chat/receive/',{idOffsetList:$scope.last_received}).then(function (response) {
 				$log.debug(response.data);
 
-
-				// first check if we are at the bottom of the div, if we are, we shall scroll once the content is added
-
-
 				angular.forEach(response.data.msgList, function(obj) {
 
 
@@ -177,12 +173,16 @@
 
 		 		});
 
-				$('.load_earlier_message').val(response.data.last_message_id+"_"+response.data.chatRoomId);
+				if(response.data.status == false){
+					$('.load_earlier_message').remove();
+				}else{
+					$('.load_earlier_message').data("id",response.data.last_message_id+"_"+response.data.chatRoomId);
+				}
 
 		 	});
 		};
 
-		$scope.createChatBox = function(id,userName) {
+		$scope.createChatBox = function(id,userName,messageId) {
 
 			$log.debug("box id: " + id);
 
@@ -194,12 +194,12 @@
 				$log.debug("size: "+ size);
 
 				if(angular.isUndefined(size)){
-					var chatBox = '<div class="row chat-window col-xs-8 col-sm-4 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" value="'+id +'"data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"><div class="load_earlier_message"><p>LOAD EARLIER MESSAGES</p></div></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+					var chatBox = '<div class="row chat-window col-xs-8 col-sm-4 col-md-3" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;'+userName+' </h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" value="'+id +'"data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"><div class="load_earlier_message" data-id="'+messageId+"_"+id+'"><p>LOAD EARLIER MESSAGES</p></div></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 					// $compile(chatBox)($scope);
 				}else{
 					var size_total = parseInt(size) + 400;
 					$log.debug("Margin Size : " + size_total);
-					var chatBox = '<div class="row chat-window col-xs-8 col-sm-4 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Miguel</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" value="'+id +'"data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"><div class="load_earlier_message"><p>LOAD EARLIER MESSAGES</p></div></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
+					var chatBox = '<div class="row chat-window col-xs-8 col-sm-4 col-md-3" style="margin-left:'+size_total+'px;" id="chat_window_'+id+'"><div class="col-xs-12 col-md-12"><div class="panel panel-default"><div class="panel-heading top-bar"><div class="col-md-9 col-xs-9"><h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>&nbsp;'+userName+'</h3></div><div class="col-md-3 col-xs-3 chat-button-container"><a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim pull-left"></span></a><a href="#"><span class="glyphicon glyphicon-remove icon_close pull-right" value="'+id +'"data-id="chat_window_1"></span></a></div></div><div class="panel-body msg_container_base msg_container_base_'+id+'"><div class="load_earlier_message" data-id="'+messageId+"_"+id+'"><p>LOAD EARLIER MESSAGES</p></div></div><div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm chat_input message" ng-model="messageToSend"placeholder="Write your message here..." /><span class="input-group-btn"><button class="btn btn-primary btn-sm btn_chat" id="btn_chat" value="'+id+'">Send</button></span></div></div></div></div></div>';
 					// $compile(chatBox)($scope);
 				}
 				$(".chat_container").append(chatBox);
@@ -240,10 +240,9 @@
 
 		$(document).on('click', '.load_earlier_message', function (e) {
 
-			var id = $(this).val();
+			var id = $(this).data("id");
 			alert(id);
 			lastMsgId = id.split("_");
-			// lastMsgId = id.split("_")[1];
 			last_msg_id = lastMsgId[0];
 			chatId = lastMsgId[1];
 			loadEarlierMessages(last_msg_id,chatId);
