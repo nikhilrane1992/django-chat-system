@@ -26,8 +26,8 @@
 				$scope.chat_room_id = response.data.chatIdList;
 				$scope.loginUser = response.data.user_name;
 				$scope.loginUserId = response.data.user_id;
-				alert(response.data.chatIdList[0].last_message_id);
-				alert(response.data.chatIdList[0].chat_id);
+				// alert(response.data.chatIdList[0].last_message_id);
+				// alert(response.data.chatIdList[0].chat_id);
 				angular.forEach(response.data.chatIdList,function(obj){
 					createChatBox(obj.chat_id);
 				});

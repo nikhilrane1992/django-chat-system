@@ -241,7 +241,7 @@
 		$(document).on('click', '.load_earlier_message', function (e) {
 
 			var id = $(this).data("id");
-			alert(id);
+			// alert(id);
 			lastMsgId = id.split("_");
 			last_msg_id = lastMsgId[0];
 			chatId = lastMsgId[1];
